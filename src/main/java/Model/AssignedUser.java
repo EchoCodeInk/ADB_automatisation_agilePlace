@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 public class AssignedUser {
     private String id;
@@ -18,13 +18,8 @@ public class AssignedUser {
         this.hasAccess = hasAccess;
         this.avatar = avatar;
     }
-
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getEmailAddress() {

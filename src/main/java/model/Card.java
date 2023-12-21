@@ -1,22 +1,20 @@
-package Model;
+package model;
 
 import java.lang.reflect.Array;
 import java.util.List;
 
-public class Carte {
+public class Card {
 
     private String id;
-    private String boardId;
+    private Board board;
     private String title;
     private  String version;
-    private String typeId;
-    private  List<String> assignedUserIds;
-
+    private Type type;
+    private  List<AssignedUser> assignedUsers;
     private String description;
     private int size;
-    private String laneId;
+    private Lane lane;
     private List<ParentCard> parentCards;
-    private Array children;
     private String mirrorSourceCardId;
     private String copiedFromCardId;
     private String blockReason;
@@ -33,30 +31,25 @@ public class Carte {
     private List<CustomField> customFields;
     private List<String> planningIncrementIds;
 
-    public Carte() {
-
-    }
 
     // Constructeur minimal
-    public Carte(String boardId, String title) {
-        this.boardId = boardId;
+    public Card(Board board , String title) {
+        this.board = board;
         this.title = title;
 
     }
 
     // Getters et setters
-
-
     public String getId() {
         return id;
     }
 
-    public String getBoardId() {
-        return boardId;
+    public Board getBoard() {
+        return board;
     }
 
-    public void setBoardId(String boardId) {
-        this.boardId = boardId;
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     public String getTitle() {
@@ -79,20 +72,21 @@ public class Carte {
         this.id = id;
     }
 
-    public String getTypeId() {
-        return typeId;
+
+    public Type getType() {
+        return type;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setType(Type type) {
+        this.type = type;
     }
 
-    public  List<String> getAssignedUserIds() {
-        return assignedUserIds;
+    public  List<AssignedUser> getAssignedUsers() {
+        return assignedUsers;
     }
 
-    public void setAssignedUserIds( List<String> assignedUserIds) {
-        this.assignedUserIds = assignedUserIds;
+    public void setAssignedUsers( List<AssignedUser> assignedUsers) {
+        this.assignedUsers = assignedUsers;
     }
 
     public String getDescription() {
@@ -111,12 +105,12 @@ public class Carte {
         this.size = size;
     }
 
-    public String getLaneId() {
-        return laneId;
+    public Lane getLane() {
+        return lane;
     }
 
-    public void setLaneId(String laneId) {
-        this.laneId = laneId;
+    public void setLane(Lane lane) {
+        this.lane = lane;
     }
 
     public List<ParentCard> getParentCards() {
@@ -125,14 +119,6 @@ public class Carte {
 
     public void setParentCards(List<ParentCard> parentCards) {
         this.parentCards = parentCards;
-    }
-
-    public Array getChildren() {
-        return children;
-    }
-
-    public void setChildren(Array children) {
-        this.children = children;
     }
 
     public String getMirrorSourceCardId() {
@@ -223,6 +209,7 @@ public class Carte {
         this.plannedFinish = plannedFinish;
     }
 
+
     public List<String> getTags() {
         return tags;
     }
@@ -238,6 +225,7 @@ public class Carte {
     public void setWipOverrideComment(String wipOverrideComment) {
         this.wipOverrideComment = wipOverrideComment;
     }
+
 
     public List<CustomField> getCustomFields() {
         return customFields;
