@@ -1,18 +1,22 @@
 package controller;
 
 public class ProgrammeController {
-    APIClientController APIcontroller  ;
-    boolean startParogramme ;
+    AgilePlaceClientController agilePlaceController;
+    EmailClientController emailController;
+    boolean startParogramme;
 
     public ProgrammeController() {
-        this.APIcontroller = new APIClientController();
+        this.agilePlaceController = new AgilePlaceClientController();
         this.startParogramme = true;
+        this.emailController = new EmailClientController();
     }
 
-    public void startProgramme(){
-        while (startParogramme){
-            APIcontroller.moveChildsCardFromBoardEstimation();
-            //APIcontroller.createCard_boardUsineADB();
+    public void startProgramme() {
+        while (startParogramme) {
+            //agilePlaceController.moveChildsCardFromBoardEstimation();
+            //agilePlaceController.createCard_boardUsineADB();
+            emailController.makeAPICallFromEmailClient();
+
 
             if (false) {
                 startParogramme = false;
@@ -21,7 +25,6 @@ public class ProgrammeController {
         }
 
     }
-
 
 
 }

@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class APIClient {
+public class AgilePlaceClient {
 
 
     private OkHttpClient client;
-    private APIConnector apiConnector;
+    private AgilePlaceConnector apiConnector;
     private int callCount;
     private static final int TOO_MANY_REQUESTS = 429;
     private static final int REQUEST_DELAY_MS = 500;
@@ -30,9 +30,9 @@ public class APIClient {
     private String BOARD_MARIO = "2027070406";
 
 
-    public APIClient() {
-        this.callCount=0;
-        this.apiConnector = new APIConnector();
+    public AgilePlaceClient() {
+        this.callCount = 0;
+        this.apiConnector = new AgilePlaceConnector();
         this.client = new OkHttpClient();
     }
 
@@ -122,7 +122,7 @@ public class APIClient {
 
 
     private Card getInfoCard(String id) {
-        String reponseAPI  = makeAPICall("/card/"+id,"GET",null);
+        String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
         System.out.println(reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
@@ -130,30 +130,29 @@ public class APIClient {
 
     private String deleteCard(int id) {
         RequestBody requestBody = new FormBody.Builder().build();
-        return makeAPICall("/card/" + id ,"DELETE", requestBody);
+        return makeAPICall("/card/" + id, "DELETE", requestBody);
     }
 
     //Déplacer une seule carte dans une autre voie(colonne)
     private void moveCard(String cardId, String destinationLaneId) {
-            String json = "{\"cardIds\":[\"" + cardId + "\"],\"destination\":{\"laneId\":\"" + destinationLaneId + "\"}}";
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        String json = "{\"cardIds\":[\"" + cardId + "\"],\"destination\":{\"laneId\":\"" + destinationLaneId + "\"}}";
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-            RequestBody requestBody = RequestBody.create(json, JSON);
-             makeAPICall("/card/move", "POST", requestBody);
+        RequestBody requestBody = RequestBody.create(json, JSON);
+        makeAPICall("/card/move", "POST", requestBody);
     }
 
     //Obtenez une liste de tous les cartes pour un tableau spécifique
     private String getListOfCardsFromBoard(int boardId) {
-        return makeAPICall( "/card?board=" + boardId , "GET", null);
+        return makeAPICall("/card?board=" + boardId, "GET", null);
     }
 
     private Cards getListOfCardsFromLineBoard(int lineId) {
-      String cardsString  = makeAPICall( "/card?lanes=" + lineId , "GET", null);
+        String cardsString = makeAPICall("/card?lanes=" + lineId, "GET", null);
         Gson gson = new Gson();
         Cards cards = gson.fromJson(cardsString, Cards.class);
         return cards;
     }
-
 
 
     //Deplacement des cartes enfant
@@ -187,7 +186,7 @@ public class APIClient {
                                     moveCard(card.getId(), BOARD_MARIO);
                                 }
                             }
-                         } //    else if () {
+                        } //    else if () {
 //
 //                               }
                     }
@@ -196,36 +195,36 @@ public class APIClient {
         }
     }
 
-    private CardEvent getActivityFromCard(String cardId){
-        String activityString  = makeAPICall( "/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
+    private CardEvent getActivityFromCard(String cardId) {
+        String activityString = makeAPICall("/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
         Gson gson = new Gson();
         return gson.fromJson(activityString, CardEvent.class);
     }
 
-    public void createCard_boardUsineADB(){
-       Cards cards = getListOfCardsFromLineBoard(2057018459);
-       List<Card> lisCards = cards.getCards();
-       for (Card card : lisCards){
-           CardEvent listEvents = getActivityFromCard(card.getId());
-            System.out.println("listEvents >>"+listEvents);
+    public void createCard_boardUsineADB() {
+        Cards cards = getListOfCardsFromLineBoard(2057018459);
+        List<Card> lisCards = cards.getCards();
+        for (Card card : lisCards) {
+            CardEvent listEvents = getActivityFromCard(card.getId());
+            System.out.println("listEvents >>" + listEvents);
 
 
             // Timestamp reçu depuis l'API
             String timestamp = listEvents.getEvents().getFirst().getTimestamp();
 
             // Convertir le timestamp en un objet Instant
-           Instant timestampInstant = Instant.parse(timestamp);
+            Instant timestampInstant = Instant.parse(timestamp);
 
             // Obtenir le temps actuel moins une heure
             Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
-           Instant oneMinuteAgo = Instant.now().minus(1, ChronoUnit.MINUTES);
+            Instant oneMinuteAgo = Instant.now().minus(1, ChronoUnit.MINUTES);
 
-            if (timestampInstant.isAfter(oneMinuteAgo)){
+            if (timestampInstant.isAfter(oneMinuteAgo)) {
                 System.out.println("PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA>>");
 
             }
 
-       }
+        }
     }
 
 
@@ -237,28 +236,28 @@ public class APIClient {
         //card.setTypeId("123456789");                                                  //<<< Probleme quand je change ce champs
 
         String json = "[";
-        if (card.getVersion()!= null){
-            json += " { \"op\": \"test\", \"path\": \"/version\", \"value\": \""+ card.getVersion() +"\" },";
+        if (card.getVersion() != null) {
+            json += " { \"op\": \"test\", \"path\": \"/version\", \"value\": \"" + card.getVersion() + "\" },";
         }
-        if (card.getTitle()!= null){
-            json += "{ \"op\":\"replace\",\"path\": \"/title\", \"value\":\"" + card.getTitle() +"\" },";
+        if (card.getTitle() != null) {
+            json += "{ \"op\":\"replace\",\"path\": \"/title\", \"value\":\"" + card.getTitle() + "\" },";
         }
-        if (card.getType().getId()!= null){
+        if (card.getType().getId() != null) {
             json += "{ \"op\": \"replace\", \"path\": \"/typeId\", \"value\": \"" + card.getType().getId() + "\" },";
         }
-        if (card.getBlockReason()!= null){
+        if (card.getBlockReason() != null) {
             json += "{ \"op\": \"replace\", \"path\": \"/blockReason\", \"value\": \"" + card.getBlockReason() + "\" },";
         }
-        if (card.getCustomIconId()!= null){
+        if (card.getCustomIconId() != null) {
             json += "{ \"op\": \"replace\", \"path\": \"/customIconId\", \"value\": \"" + card.getCustomIconId() + "\" },";
         }
-        if (card.getCustomId()!= null){
+        if (card.getCustomId() != null) {
             json += "{ \"op\": \"replace\", \"path\": \"/customId\", \"value\": \"" + card.getCustomId().getValue() + "\" },";// Ceci est la section En-tete de la carte
         }
-        if (card.getDescription()!= null){
+        if (card.getDescription() != null) {
             json += "{ \"op\": \"replace\", \"path\": \"/description\", \"value\": \"" + card.getDescription() + "\" },";
         }
-        if (card.getIndex() != 0){
+        if (card.getIndex() != 0) {
             json += "{ \"op\": \"replace\", \"path\": \"/index\", \"value\": " + card.getIndex() + " },";
         }
         if (card.isBlocked()) {
@@ -266,10 +265,10 @@ public class APIClient {
         } else {
             json += "{ \"op\": \"replace\", \"path\": \"/isBlocked\", \"value\": false },";
         }
-        if (card.getLane().getId()!= null){
+        if (card.getLane().getId() != null) {
             json += "{ \"op\": \"replace\", \"path\": \"/laneId\", \"value\": \"" + card.getLane().getId() + "\" },";// Ceci est le #Id de colonne
         }
-        if (card.getSize()!= 0){
+        if (card.getSize() != 0) {
             json += "{ \"op\": \"replace\", \"path\": \"/size\", \"value\": " + card.getSize() + " },";
         }
 
@@ -290,7 +289,6 @@ public class APIClient {
 //       if (card.getWipOverrideComment()!= null){
 //           json += "{ \"op\": \"replace\", \"path\": \"/wipOverrideComment\", \"value\": \"" + card.getWipOverrideComment() + "\" },";
 //       }
-
 
 
         // Supprimez la virgule en trop à la fin
