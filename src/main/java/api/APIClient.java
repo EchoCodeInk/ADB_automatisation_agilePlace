@@ -1,9 +1,6 @@
 package api;
 
-import model.AssignedUser;
-import model.Card;
-import model.Cards;
-import model.ParentCard;
+import model.*;
 import com.google.gson.Gson;
 
 import okhttp3.*;
@@ -12,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -22,11 +21,9 @@ public class APIClient {
 
     private OkHttpClient client;
     private APIConnector apiConnector;
-
     private int callCount;
     private static final int TOO_MANY_REQUESTS = 429;
-    private static final int REQUEST_DELAY_MS = 1200;
-
+    private static final int REQUEST_DELAY_MS = 500;
     private String BOARD_CRM_VERIfICATION_TERMINE = "2055641730";
     private String BOARD_ANDRE = "2027070404";
     private String BOARD_JESSY = "2027070405";
@@ -124,20 +121,20 @@ public class APIClient {
     }
 
 
-    public Card getInfoCard(String id) {
+    private Card getInfoCard(String id) {
         String reponseAPI  = makeAPICall("/card/"+id,"GET",null);
         Gson gson = new Gson();
         System.out.println(reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
     }
 
-    public String deleteCard(int id) {
+    private String deleteCard(int id) {
         RequestBody requestBody = new FormBody.Builder().build();
         return makeAPICall("/card/" + id ,"DELETE", requestBody);
     }
 
     //Déplacer une seule carte dans une autre voie(colonne)
-    public void moveCard(String cardId, String destinationLaneId) {
+    private void moveCard(String cardId, String destinationLaneId) {
             String json = "{\"cardIds\":[\"" + cardId + "\"],\"destination\":{\"laneId\":\"" + destinationLaneId + "\"}}";
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -146,11 +143,11 @@ public class APIClient {
     }
 
     //Obtenez une liste de tous les cartes pour un tableau spécifique
-    public String getListOfCardsFromBoard(int boardId) {
+    private String getListOfCardsFromBoard(int boardId) {
         return makeAPICall( "/card?board=" + boardId , "GET", null);
     }
 
-    public Cards getListOfCardsFromLineBoard(int lineId) {
+    private Cards getListOfCardsFromLineBoard(int lineId) {
       String cardsString  = makeAPICall( "/card?lanes=" + lineId , "GET", null);
         Gson gson = new Gson();
         Cards cards = gson.fromJson(cardsString, Cards.class);
@@ -178,19 +175,57 @@ public class APIClient {
                     for (ParentCard parent : parentsLists) {
 
                         Card cardParent = getInfoCard(parent.getCardId());
+
                         if (cardParent != null && cardParent.getLane().getId().equals(BOARD_CRM_VERIfICATION_TERMINE)) {
-                            if (card.getAssignedUsers().getFirst().getFullName().equals("Jessy Therrien")){
-                                moveCard(card.getId(), BOARD_JESSY);
-                            } else if (card.getAssignedUsers().getFirst().getFullName().equals("André Berthiaume")) {
-                                moveCard(card.getId(), BOARD_ANDRE);
-                            }else if (card.getAssignedUsers().getFirst().getFullName().equals("Mario Vivier")) {
-                                moveCard(card.getId(), BOARD_MARIO);
+                            for (AssignedUser assignedUser : card.getAssignedUsers()) {
+                                String fullName = assignedUser.getFullName();
+                                if (fullName.equals("Jessy Therrien")) {
+                                    moveCard(card.getId(), BOARD_JESSY);
+                                } else if (fullName.equals("André Berthiaume")) {
+                                    moveCard(card.getId(), BOARD_ANDRE);
+                                } else if (fullName.equals("Mario Vivier")) {
+                                    moveCard(card.getId(), BOARD_MARIO);
+                                }
                             }
-                        }
+                         } //    else if () {
+//
+//                               }
                     }
                 }
             }
         }
+    }
+
+    private CardEvent getActivityFromCard(String cardId){
+        String activityString  = makeAPICall( "/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
+        Gson gson = new Gson();
+        return gson.fromJson(activityString, CardEvent.class);
+    }
+
+    public void createCard_boardUsineADB(){
+       Cards cards = getListOfCardsFromLineBoard(2057018459);
+       List<Card> lisCards = cards.getCards();
+       for (Card card : lisCards){
+           CardEvent listEvents = getActivityFromCard(card.getId());
+            System.out.println("listEvents >>"+listEvents);
+
+
+            // Timestamp reçu depuis l'API
+            String timestamp = listEvents.getEvents().getFirst().getTimestamp();
+
+            // Convertir le timestamp en un objet Instant
+           Instant timestampInstant = Instant.parse(timestamp);
+
+            // Obtenir le temps actuel moins une heure
+            Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
+           Instant oneMinuteAgo = Instant.now().minus(1, ChronoUnit.MINUTES);
+
+            if (timestampInstant.isAfter(oneMinuteAgo)){
+                System.out.println("PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA>>");
+
+            }
+
+       }
     }
 
 

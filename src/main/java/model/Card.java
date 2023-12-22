@@ -12,6 +12,8 @@ public class Card {
     private Type type;
     private  List<AssignedUser> assignedUsers;
     private String description;
+
+    private Event events;
     private int size;
     private Lane lane;
     private List<ParentCard> parentCards;
