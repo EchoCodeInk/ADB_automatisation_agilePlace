@@ -12,11 +12,5 @@ public class AgilePlaceClientController {
     protected void moveChildsCardFromBoardEstimation() {
         apiClient.moveChildsCardFromBoardEstimation();
     }
-    protected void createCard_boardUsineADB() {
-        apiClient.createCard_boardUsineADB();
-    }
-
-
-
 
 }

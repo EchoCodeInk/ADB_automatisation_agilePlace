@@ -18,7 +18,6 @@ import java.util.Locale;
 
 public class AgilePlaceClient {
 
-
     private OkHttpClient client;
     private AgilePlaceConnector apiConnector;
     private int callCount;
@@ -124,20 +123,14 @@ public class AgilePlaceClient {
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
-        System.out.println(reponseAPI);
+        //System.out.println(reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
-    }
-
-    private String deleteCard(int id) {
-        RequestBody requestBody = new FormBody.Builder().build();
-        return makeAPICall("/card/" + id, "DELETE", requestBody);
     }
 
     //Déplacer une seule carte dans une autre voie(colonne)
     private void moveCard(String cardId, String destinationLaneId) {
         String json = "{\"cardIds\":[\"" + cardId + "\"],\"destination\":{\"laneId\":\"" + destinationLaneId + "\"}}";
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
         RequestBody requestBody = RequestBody.create(json, JSON);
         makeAPICall("/card/move", "POST", requestBody);
     }
@@ -186,9 +179,7 @@ public class AgilePlaceClient {
                                     moveCard(card.getId(), BOARD_MARIO);
                                 }
                             }
-                        } //    else if () {
-//
-//                               }
+                        }
                     }
                 }
             }
@@ -201,31 +192,7 @@ public class AgilePlaceClient {
         return gson.fromJson(activityString, CardEvent.class);
     }
 
-    public void createCard_boardUsineADB() {
-        Cards cards = getListOfCardsFromLineBoard(2057018459);
-        List<Card> lisCards = cards.getCards();
-        for (Card card : lisCards) {
-            CardEvent listEvents = getActivityFromCard(card.getId());
-            System.out.println("listEvents >>" + listEvents);
 
-
-            // Timestamp reçu depuis l'API
-            String timestamp = listEvents.getEvents().getFirst().getTimestamp();
-
-            // Convertir le timestamp en un objet Instant
-            Instant timestampInstant = Instant.parse(timestamp);
-
-            // Obtenir le temps actuel moins une heure
-            Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
-            Instant oneMinuteAgo = Instant.now().minus(1, ChronoUnit.MINUTES);
-
-            if (timestampInstant.isAfter(oneMinuteAgo)) {
-                System.out.println("PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA>>");
-
-            }
-
-        }
-    }
 
 
     // Mise a jour d'une carte specifique
