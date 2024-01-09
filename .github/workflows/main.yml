@@ -19,5 +19,6 @@ jobs:
       run: javac src/main/java/Main.java
 
     - name: Exécution du programme
-      run: java src/main/java/Main
+      run: java -cp src/main/java Main
+
 
