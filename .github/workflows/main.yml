@@ -16,10 +16,8 @@ jobs:
         java-version: '21'
         distribution: 'adopt'
 
-   
-
     - name: Exécution du programme
-      run: java -cp src/main/java Main.java.Main
+      run: java -cp src/main/java Main.java
 
 
 
