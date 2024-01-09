@@ -17,7 +17,7 @@ jobs:
         distribution: 'adopt'
 
     - name: Compilation du code
-      run: javac src/main/java/Main.java
+      run: java src/main/java/Main.java
 
     - name: Exécution du programme
       run: java -cp src/main/java Main.java.Main
