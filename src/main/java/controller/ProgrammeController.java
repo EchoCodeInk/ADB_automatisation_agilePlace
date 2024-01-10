@@ -11,8 +11,8 @@ public class ProgrammeController {
 
     public void startProgramme() {
         while (startParogramme) {
-            //agilePlaceController.moveChildsCardFromBoardEstimation();
-            agilePlaceController.calenderAutomate();
+            agilePlaceController.moveChildsCardFromBoardEstimation();
+            //agilePlaceController.calenderAutomate();
 
 
             if (false) {

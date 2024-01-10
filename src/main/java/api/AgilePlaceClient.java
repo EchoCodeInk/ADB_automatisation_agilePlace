@@ -183,7 +183,7 @@ public class AgilePlaceClient {
 
     //Calendrier automatisation
     public void calenderAutomate() {
-    
+
 
         System.out.println("testing");
     }
