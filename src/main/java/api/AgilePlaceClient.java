@@ -28,6 +28,8 @@ public class AgilePlaceClient {
     private String BOARD_JESSY = "2027070405";
     private String BOARD_MARIO = "2027070406";
 
+    public enum Mois {JANVIER, FEVRIER, MARS, AVRIL, MAI, JUIN, JUILLET, AOUT, SEPTEMBRE, OCTOBRE, NOVEMBRE, DECEMBRE}
+
 
     public AgilePlaceClient() {
         this.callCount = 0;
@@ -123,7 +125,6 @@ public class AgilePlaceClient {
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
-        //System.out.println(reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
     }
 
@@ -135,18 +136,12 @@ public class AgilePlaceClient {
         makeAPICall("/card/move", "POST", requestBody);
     }
 
-    //Obtenez une liste de tous les cartes pour un tableau spécifique
-    private String getListOfCardsFromBoard(int boardId) {
-        return makeAPICall("/card?board=" + boardId, "GET", null);
-    }
-
     private Cards getListOfCardsFromLineBoard(int lineId) {
         String cardsString = makeAPICall("/card?lanes=" + lineId, "GET", null);
         Gson gson = new Gson();
         Cards cards = gson.fromJson(cardsString, Cards.class);
         return cards;
     }
-
 
     //Deplacement des cartes enfant
     public void moveChildsCardFromBoardEstimation() {
@@ -186,14 +181,23 @@ public class AgilePlaceClient {
         }
     }
 
+    //Calendrier automatisation
+    public void calenderAutomate() {
+    
+
+        System.out.println("testing");
+    }
+
     private CardEvent getActivityFromCard(String cardId) {
         String activityString = makeAPICall("/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
         Gson gson = new Gson();
         return gson.fromJson(activityString, CardEvent.class);
     }
 
-
-
+    //Obtenez une liste de tous les cartes pour un tableau spécifique
+    private String getListOfCardsFromBoard(int boardId) {
+        return makeAPICall("/card?board=" + boardId, "GET", null);
+    }
 
     // Mise a jour d'une carte specifique
     public void updateCard(@NotNull Card card) {

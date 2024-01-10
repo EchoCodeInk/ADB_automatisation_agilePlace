@@ -13,4 +13,8 @@ public class AgilePlaceClientController {
         apiClient.moveChildsCardFromBoardEstimation();
     }
 
+    protected void calenderAutomate() {
+        apiClient.calenderAutomate();
+    }
+
 }
