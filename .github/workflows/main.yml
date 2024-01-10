@@ -22,8 +22,9 @@ jobs:
     - name: Compilation et Tests
       run: mvn clean install -B
   
-    - name: Exécution du programme
-      run: java -cp target/classes Main
+    - name: Exécution du programme avec Maven
+      run: mvn exec:java -Dexec.mainClass="Main" -B
+
 
 
 
