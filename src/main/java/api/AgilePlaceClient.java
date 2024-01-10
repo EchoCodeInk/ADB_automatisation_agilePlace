@@ -4,16 +4,13 @@ import model.*;
 import com.google.gson.Gson;
 
 import okhttp3.*;
+import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 
 public class AgilePlaceClient {
@@ -23,10 +20,11 @@ public class AgilePlaceClient {
     private int callCount;
     private static final int TOO_MANY_REQUESTS = 429;
     private static final int REQUEST_DELAY_MS = 500;
-    private String BOARD_CRM_VERIfICATION_TERMINE = "2055641730";
-    private String BOARD_ANDRE = "2027070404";
-    private String BOARD_JESSY = "2027070405";
-    private String BOARD_MARIO = "2027070406";
+    private int BOARD_CRM_VERIfICATION_TERMINE = 2055641730;
+    private int BOARD_ESTIMATION_VERIfICATION_SYLVAIN = 2063614479;
+    private String BOARD_ANDRE = "2063586246";
+    private String BOARD_JESSY = "2063637757";
+    private String BOARD_MARIO = "2063637758";
 
     public enum Mois {JANVIER, FEVRIER, MARS, AVRIL, MAI, JUIN, JUILLET, AOUT, SEPTEMBRE, OCTOBRE, NOVEMBRE, DECEMBRE}
 
@@ -52,13 +50,11 @@ public class AgilePlaceClient {
                 requestBuilder = requestBuilder.post(requestBody);
                 break;
             case "DELETE":
-                requestBuilder = requestBuilder
-                        .addHeader("X-HTTP-Method-Override", "DELETE")
+                requestBuilder = requestBuilder.addHeader("X-HTTP-Method-Override", "DELETE")
                         .post(requestBody);
                 break;
             case "PATCH":
-                requestBuilder = requestBuilder
-                        .addHeader("X-HTTP-Method-Override", "PATCH")
+                requestBuilder = requestBuilder.addHeader("X-HTTP-Method-Override", "PATCH")
                         .post(requestBody);
                 break;
             // Ajoute d'autres méthodes si nécessaire (PUT, PATCH, etc.)
@@ -144,34 +140,32 @@ public class AgilePlaceClient {
     }
 
     //Deplacement des cartes enfant
-    public void moveChildsCardFromBoardEstimation() {
+    public void moveCardOfBoardEstimationOfTheLaneSylvain() {
 
-        Cards cards = getListOfCardsFromLineBoard(2063614479);
+        Cards cards = getListOfCardsFromLineBoard(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
+        Cards cards2 = getListOfCardsFromLineBoard(BOARD_CRM_VERIfICATION_TERMINE);
+
         List<Card> cardList = cards.getCards();
+        List<Card> cardList2 = cards2.getCards();
 
         if (cardList != null && !cardList.isEmpty()) {
-            for (Card card : cardList) {
-                card = getInfoCard(card.getId());
+            for (Card cardFromList : cardList) {
+                Card cardToMove = getInfoCard(cardFromList.getId());
 
-                List<ParentCard> parentsLists = card.getParentCards();
+                if (cardList2 != null) {
+                    for (Card cardFromList2 : cardList2) {
 
-                card.setParentCards(parentsLists);
+                        Card cardCompare = getInfoCard(cardFromList2.getId());
 
-
-                if (parentsLists != null) {
-                    for (ParentCard parent : parentsLists) {
-
-                        Card cardParent = getInfoCard(parent.getCardId());
-
-                        if (cardParent != null && cardParent.getLane().getId().equals(BOARD_CRM_VERIfICATION_TERMINE)) {
-                            for (AssignedUser assignedUser : card.getAssignedUsers()) {
+                        if (cardCompare != null && cardCompare.getCustomId().getValue().equals(cardToMove.getCustomId().getValue())) {
+                            for (AssignedUser assignedUser : cardToMove.getAssignedUsers()) {
                                 String fullName = assignedUser.getFullName();
                                 if (fullName.equals("Jessy Therrien")) {
-                                    moveCard(card.getId(), BOARD_JESSY);
+                                    moveCard(cardToMove.getId(), BOARD_JESSY);
                                 } else if (fullName.equals("André Berthiaume")) {
-                                    moveCard(card.getId(), BOARD_ANDRE);
+                                    moveCard(cardToMove.getId(), BOARD_ANDRE);
                                 } else if (fullName.equals("Mario Vivier")) {
-                                    moveCard(card.getId(), BOARD_MARIO);
+                                    moveCard(cardToMove.getId(), BOARD_MARIO);
                                 }
                             }
                         }
@@ -181,12 +175,41 @@ public class AgilePlaceClient {
         }
     }
 
+    //Mettre ajour une Voie(Lane)
+    private Lane updateALane(int boardId, int laneId, Map<String, Object> propertiesToUpdate) {
+        Gson gson = new Gson();
+        String json = gson.toJson(propertiesToUpdate);
+        System.out.println("updateALane>>> json: " + json);
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(json, JSON);
+        System.out.println("updateALane>>> requestBody: " + requestBody);
+        // Effectuer la requête PATCH pour mettre à jour la voie (Lane)
+        String reponseAPI = makeAPICall("/board/" + boardId + "/lane/" + laneId, "PATCH", requestBody);
+        // Traitement de la réponse de l'API
+        System.out.println("updateALane>>> reponseAPI: " + reponseAPI);
+        return gson.fromJson(reponseAPI, Lane.class);
+    }
+
+    // Exemple d'utilisation pour mettre à jour le titre et la description de la voie
+    private void updateLaneTitleAndDescription() {
+        int boardId = 2057018447;
+        int laneId = 2057018491;
+
+        Map<String, Object> propertiesToUpdate = new HashMap<>();
+        propertiesToUpdate.put("title", "new lane title");
+        propertiesToUpdate.put("description", "the new lane policy");
+
+        Lane updatedLane = updateALane(boardId, laneId, propertiesToUpdate);
+        System.out.println("updateLaneTitleAndDescription >>> Updated Lane: " + updatedLane);
+    }
+
     //Calendrier automatisation
     public void calenderAutomate() {
-
+        updateLaneTitleAndDescription();
 
         System.out.println("testing");
     }
+
 
     private CardEvent getActivityFromCard(String cardId) {
         String activityString = makeAPICall("/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);

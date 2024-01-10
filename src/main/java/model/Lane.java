@@ -11,10 +11,16 @@ public class Lane {
     private String title;
     private String taskBoard;
     private String cardStatus;
+    private String boardId;
+    private String type;
+    private String wipLimit;
+    private String isDefaultDropLane;
+    private String isConnectionDoneLane;
+    private String sortBy;
 
     // Constructeur
 
-    public Lane(int cardLimit, String description, String id, int index, String laneClassType, String laneType, String orientation, String title, String taskBoard, String cardStatus) {
+    public Lane(int cardLimit, String description, String id, int index, String laneClassType, String laneType, String orientation, String title, String taskBoard, String cardStatus, String boardId, String type, String wipLimit, String isDefaultDropLane, String isConnectionDoneLane, String sortBy) {
         this.cardLimit = cardLimit;
         this.description = description;
         this.id = id;
@@ -25,6 +31,60 @@ public class Lane {
         this.title = title;
         this.taskBoard = taskBoard;
         this.cardStatus = cardStatus;
+        this.boardId = boardId;
+        this.type = type;
+        this.wipLimit = wipLimit;
+        this.isDefaultDropLane = isDefaultDropLane;
+        this.isConnectionDoneLane = isConnectionDoneLane;
+        this.sortBy = sortBy;
+    }
+
+    public String getBoardId() {
+        return boardId;
+    }
+
+    public void setBoardId(String boardId) {
+        this.boardId = boardId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getWipLimit() {
+        return wipLimit;
+    }
+
+    public void setWipLimit(String wipLimit) {
+        this.wipLimit = wipLimit;
+    }
+
+    public String getIsDefaultDropLane() {
+        return isDefaultDropLane;
+    }
+
+    public void setIsDefaultDropLane(String isDefaultDropLane) {
+        this.isDefaultDropLane = isDefaultDropLane;
+    }
+
+    public String getIsConnectionDoneLane() {
+        return isConnectionDoneLane;
+    }
+
+    public void setIsConnectionDoneLane(String isConnectionDoneLane) {
+        this.isConnectionDoneLane = isConnectionDoneLane;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
     }
 
 
