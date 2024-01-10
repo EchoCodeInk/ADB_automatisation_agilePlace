@@ -1,0 +1,26 @@
+name: Workflow Java
+
+on: [push] # Déclenche le workflow lors d'un push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v2
+
+    - name: Configurer Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '21'
+        distribution: 'adopt'
+        
+    - name: Compilation du code
+      run: javac src/main/java/Main.java
+  
+    - name: Exécution du programme
+      run: java src/main/java Main
+
+
+
