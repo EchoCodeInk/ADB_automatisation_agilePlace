@@ -23,7 +23,7 @@ jobs:
       run: mvn clean install -B
   
     - name: Exécution du programme
-      run: java src/main/java Main
+      run: java -cp target/classes Main
 
 
 
