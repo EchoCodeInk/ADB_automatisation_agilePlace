@@ -16,8 +16,11 @@ jobs:
         java-version: '21'
         distribution: 'adopt'
         
-    - name: Compilation du code
-      run: javac src/main/java/Main.java
+    - name: Installer Apache Maven
+      run: sudo apt-get install -y maven
+
+    - name: Compilation et Tests
+      run: mvn clean install -B
   
     - name: Exécution du programme
       run: java src/main/java Main
