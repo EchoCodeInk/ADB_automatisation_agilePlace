@@ -1,5 +1,6 @@
 package controller;
 
+import java.time.LocalDate;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -7,28 +8,25 @@ import java.util.concurrent.TimeUnit;
 public class ProgrammeController {
     private AgilePlaceClientController agilePlaceController;
     private ScheduledExecutorService scheduler;
-    private volatile boolean startParogramme;
 
     public ProgrammeController() {
         this.agilePlaceController = new AgilePlaceClientController();
         this.scheduler = Executors.newScheduledThreadPool(1);
-        this.startParogramme = true;
     }
-
     public void startProgramme() {
+
         System.out.println("Start programme ");
-        Runnable task = () -> {
-            //agilePlaceController.moveCardOfBoardEstimationOfTheLaneSylvain();
+
+        Runnable task1 = () -> {
+            agilePlaceController.moveCardOfBoardEstimationOfTheLaneSylvain();
         };
 
+        if (LocalDate.now().getDayOfMonth() == 1) {
+            agilePlaceController.calenderAutomate();
+        }
 
-        agilePlaceController.calenderAutomate();
-
-        // Planifie l'exécution de la tâche une fois par heure
-        scheduler.scheduleAtFixedRate(task, 0, 60, TimeUnit.SECONDS);
-
+        scheduler.scheduleAtFixedRate(task1, 0, 1, TimeUnit.HOURS);
     }
-
     public void stopScheduler() {
         scheduler.shutdown(); // Arrête l'exécution des tâches planifiées
     }
