@@ -1,5 +1,6 @@
 package controller;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,17 +16,21 @@ public class ProgrammeController {
     }
     public void startProgramme() {
 
-        System.out.println("Start programme ");
+        System.out.println("START PROGRAMME ");
 
         Runnable task1 = () -> {
             agilePlaceController.moveCardOfBoardEstimationOfTheLaneSylvain();
         };
 
         if (LocalDate.now().getDayOfMonth() == 1) {
-            agilePlaceController.calenderAutomate();
+            agilePlaceController.updateBoardEstimationLaneCalendrierDesObjectifsUpdate();
+        }
+        if (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY) {
+            agilePlaceController.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
         }
 
-        scheduler.scheduleAtFixedRate(task1, 0, 1, TimeUnit.HOURS);
+
+        scheduler.scheduleAtFixedRate(task1, 0, 15, TimeUnit.MINUTES);
     }
     public void stopScheduler() {
         scheduler.shutdown(); // Arrête l'exécution des tâches planifiées

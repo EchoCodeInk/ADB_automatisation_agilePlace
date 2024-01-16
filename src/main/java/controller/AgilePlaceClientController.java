@@ -16,8 +16,11 @@ public class AgilePlaceClientController {
         apiClient.moveCardOfBoardEstimationOfTheLaneSylvain();
     }
 
-    protected void calenderAutomate() {
-        apiClient.calenderAutomate();
+    protected void updateBoardEstimationLaneCalendrierDesObjectifsUpdate() {
+        apiClient.updateBoardEstimationLaneCalendrierDesObjectifs();
+    }
+    protected void updateBoardEstimationLaneCalendrierEnCoursDEstimation() {
+        apiClient.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
     }
 
 }

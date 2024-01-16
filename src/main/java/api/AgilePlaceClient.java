@@ -11,122 +11,162 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
+import static com.fasterxml.jackson.databind.cfg.CoercionInputShape.Array;
+import static java.lang.String.valueOf;
 import static model.Semestre.Mois.moisAPartirDe;
 import static model.Semestre.obtenirMoisActuel;
-
 
 public class AgilePlaceClient {
     private OkHttpClient client;
     private AgilePlaceConnector apiConnector;
-    private int callCount;
-    String currentMonth = "JANUARY";
     private static final int TOO_MANY_REQUESTS = 429;
     private static final int REQUEST_DELAY_MS = 500;
+
+    // Attribut pour la gestion des estimations terminer de Sylvain
     private int BOARD_CRM_VERIfICATION_TERMINE = 2055641730;
     private int BOARD_ESTIMATION_VERIfICATION_SYLVAIN = 2063614479;
+    private String BOARD_ANDRE = "2070706294";
+    private String BOARD_JESSY = "2070706296";
+    private String BOARD_MARIO = "2070706298";
 
-    private int CALENDRIER_BOARD = 2057018447;
-    private int CALENDRIER_LANE_1 = 2057018491;
-    private int CALENDRIER_LANE_2 = 2070897052;
-    private int CALENDRIER_LANE_3 = 2070897053;
-    private int CALENDRIER_LANE_4 = 2070897054;
-    private int CALENDRIER_LANE_5 = 2070897055;
-    private int CALENDRIER_LANE_6 = 2070897056;
-    private String BOARD_ANDRE = "2063586246";
-    private String BOARD_JESSY = "2063637757";
-    private String BOARD_MARIO = "2063637758";
+    // Attribut pour le "CALENDRIER DES OBJECTIFS" du board "ESTIMATION"
+    String currentMonth;
+    private int ESTIMATION_BOARD = 1954823342;
+    private int CALENDRIER_LANE = 2072271545;
+    private int CALENDRIER_LANE_MONTH_1 = 2072107008;
+    private int CALENDRIER_LANE_MONTH_2 = 2072107009;
+    private int CALENDRIER_LANE_MONTH_3 = 2072107010;
+    private int CALENDRIER_LANE_MONTH_4 = 2072271540;
+    private int CALENDRIER_LANE_MONTH_5 = 2072271541;
+    private int CALENDRIER_LANE_MONTH_6 = 2072271542;
+    private int CALENDRIER_TO_ARCHIVE_GAGNEES = 2058436638;
 
+    //Attribut pour le calendrier "EN COURS D'ESTIMATION" du board "ESTIMATION"
+
+    private int CAL_ANDRE_MAIN_LANE = 2043380283;
+    private int CAL_JESSY_MAIN_LANE = 2043624709;
+    private int CAL_MARIO_MAIN_LANE = 2043624714;
+    private int CAL_GAETAN_MAIN_LANE = 2074240317;
+    private int CAL_ANDRE_SEM_EN_COURS = 2043380284;
+    private int CAL_JESSY_SEM_EN_COURS = 2043380285;
+    private int CAL_MARIO_SEM_EN_COURS = 2043380286;
+    private int CAL_GAETAN_SEM_EN_COURS = 2074240312;
+    private int CAL_ANDRE_SEM_2 = 2063557856;
+    private int CAL_ANDRE_SEM_3 = 2063557857;
+    private int CAL_ANDRE_SEM_4 = 2074260484;
+    private int CAL_JESSY_SEM_2 = 2063557858;
+    private int CAL_JESSY_SEM_3 = 2063557859;
+    private int CAL_JESSY_SEM_4 = 2074260485;
+    private int CAL_MARIO_SEM_2 = 2063557860;
+    private int CAL_MARIO_SEM_3 = 2063557861;
+    private int CAL_MARIO_SEM_4 = 2074260486;
+    private int CAL_GAETAN_SEM_2 = 2074240315;
+    private int CAL_GAETAN_SEM_3 = 2074240316;
+    private int CAL_GAETAN_SEM_4 = 2074260487;
 
     public AgilePlaceClient() {
-        this.callCount = 0;
         this.apiConnector = new AgilePlaceConnector();
         this.client = new OkHttpClient();
     }
 
     private String makeAPICall(String endpoint, String method, RequestBody requestBody) {
-        callCount++;
-        Request.Builder requestBuilder = new Request.Builder()
-                .url(apiConnector.getAPIBaseUrl() + endpoint)
-                .addHeader("Authorization", "Bearer " + apiConnector.getAPIJetonKey());
-        System.out.println("makeAPICall() Count >> " + callCount);
-        // Selon la méthode, configurer la requête correctement
-        switch (method.toUpperCase()) {
-            case "GET":
-                requestBuilder = requestBuilder.get();
-                break;
-            case "POST":
-                requestBuilder = requestBuilder.post(requestBody);
-                break;
-            case "DELETE":
-                requestBuilder = requestBuilder.addHeader("X-HTTP-Method-Override", "DELETE")
-                        .post(requestBody);
-                break;
-            case "PATCH":
-                requestBuilder = requestBuilder.addHeader("X-HTTP-Method-Override", "PATCH")
-                        .post(requestBody);
-                break;
-            // Ajoute d'autres méthodes si nécessaire (PUT, PATCH, etc.)
-            default:
-                System.out.println("makeAPICall() >> Gérer le cas par défaut, la méthode n'est pas prise en charge.");
-        }
-
-        Request request = requestBuilder.build();
-
         try {
-            Response response = client.newCall(request).execute();
-            int statusCode = response.code();
+            client = new OkHttpClient.Builder()
+                    .callTimeout(30, TimeUnit.SECONDS)
+                    .build();
 
-            if (statusCode == TOO_MANY_REQUESTS) {
-                // Gérer la réponse 429 Too Many Requests
-                String retryAfter = response.header("Retry-After");
+            Request.Builder requestBuilder = new Request.Builder()
+                    .url(apiConnector.getAPIBaseUrl() + endpoint)
+                    .addHeader("Authorization", "Bearer " + apiConnector.getAPIJetonKey());
 
-                if (retryAfter != null) {
-                    try {
-                        // Convertir la date RFC 2822 en un objet Date
-                        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-                        Date retryDate = format.parse(retryAfter);
+            switch (method.toUpperCase()) {
+                case "GET":
+                    requestBuilder = requestBuilder.get();
+                    break;
+                case "POST":
+                    requestBuilder = requestBuilder.post(requestBody);
+                    break;
+                case "DELETE":
+                    requestBuilder = requestBuilder.addHeader("X-HTTP-Method-Override", "DELETE")
+                            .post(requestBody);
+                    break;
+                case "PATCH":
+                    requestBuilder = requestBuilder.addHeader("X-HTTP-Method-Override", "PATCH")
+                            .post(requestBody);
+                    break;
+                default:
+                    System.out.println("makeAPICall() >> Gérer le cas par défaut, la méthode n'est pas prise en charge.");
+            }
 
-                        // Calculer le temps d'attente en millisecondes à partir de la date actuelle
-                        long currentTime = System.currentTimeMillis();
-                        long retryTime = retryDate.getTime();
-                        long timeoutMs = Math.max(0, retryTime - currentTime); // Assurez-vous que le délai n'est pas négatif
+            Request request = requestBuilder.build();
 
-                        System.out.println("Received a 429 response. Waiting for " + (timeoutMs / 1000) + " seconds before retrying...");
-                        Thread.sleep(timeoutMs);
+            try {
+                Response response = client.newCall(request).execute();
+                int statusCode = response.code();
 
-                        // Réessayer l'appel après le délai spécifié
-                        return makeAPICall(endpoint, method, requestBody);
-                    } catch (ParseException | InterruptedException e) {
-                        e.printStackTrace();
-                        // Gérer les exceptions ici
-                        return null;
-                    }
+                if (statusCode == TOO_MANY_REQUESTS) {
+                    handleTooManyRequests(response, endpoint, method, requestBody);
+                }
+
+                Thread.sleep(REQUEST_DELAY_MS);
+
+                if (isSuccessful(statusCode)) {
+                    assert response.body() != null;
+                    return response.body().string();
                 } else {
-                    System.out.println("Retry-After header not found. Cannot determine the wait time.");
-                    // Gérer en cas de Retry-After non défini dans l'en-tête
+                    handleErrorResponse(response);
                     return null;
                 }
-            }
-
-            // Ajouter le délai entre les appels pour respecter les limites de débit
-            Thread.sleep(REQUEST_DELAY_MS);
-
-            // Gérer d'autres cas de statut de réponse ici
-            if (response.isSuccessful()) {
-                return response.body().string();
-            } else {
-                // Gérer les autres codes d'erreur ici
+            } catch (IOException | InterruptedException e) {
+                handleException(e);
                 return null;
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            // Gérer les exceptions ici
+        } catch (Exception e) {
+            handleException(e);
             return null;
         }
     }
 
+    private void handleTooManyRequests(Response response, String endpoint, String method, RequestBody requestBody) {
+        String retryAfter = response.header("Retry-After");
 
+        if (retryAfter != null) {
+            try {
+                // Convertir la date RFC 2822 en un objet Date
+                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                Date retryDate = format.parse(retryAfter);
+
+                // Calculer le temps d'attente en millisecondes à partir de la date actuelle
+                long currentTime = System.currentTimeMillis();
+                long retryTime = retryDate.getTime();
+                long timeoutMs = Math.max(0, retryTime - currentTime);
+
+                System.out.println("Received a 429 response. Waiting for " + (timeoutMs / 1000) + " seconds before retrying...");
+                Thread.sleep(timeoutMs);
+
+                // Réessayer l'appel après le délai spécifié
+                makeAPICall(endpoint, method, requestBody);
+            } catch (ParseException | InterruptedException e) {
+                handleException(e);
+            }
+        } else {
+            System.out.println("Retry-After header not found. Cannot determine the wait time.");
+        }
+    }
+
+    private boolean isSuccessful(int statusCode) {
+        return statusCode >= 200 && statusCode < 300;
+    }
+
+    private void handleErrorResponse(Response response) {
+        System.out.println("Une exception spécifique s'est produite dans handleErrorResponse() : " + response);
+    }
+    private void handleException(Exception e) {
+        e.printStackTrace();
+        // Logique pour gérer les exceptions ici
+    }
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
@@ -144,13 +184,12 @@ public class AgilePlaceClient {
     private Cards getListOfCardsFromLane(int laneId) {
         String cardsString = makeAPICall("/card?lanes=" + laneId, "GET", null);
         Gson gson = new Gson();
-        Cards cards = gson.fromJson(cardsString, Cards.class);
-        return cards;
+        return gson.fromJson(cardsString, Cards.class);
     }
 
     //Deplacement des cartes enfant
     public void moveCardOfBoardEstimationOfTheLaneSylvain() {
-
+        System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain() START");
         Cards cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
         Cards cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
 
@@ -169,12 +208,10 @@ public class AgilePlaceClient {
                             if (cardCompare != null && cardCompare.getCustomId().getValue().equals(cardToMove.getCustomId().getValue())) {
                                 for (AssignedUser assignedUser : cardToMove.getAssignedUsers()) {
                                     String fullName = assignedUser.getFullName();
-                                    if (fullName.equals("Jessy Therrien")) {
-                                        moveCard(cardToMove.getId(), BOARD_JESSY);
-                                    } else if (fullName.equals("André Berthiaume")) {
-                                        moveCard(cardToMove.getId(), BOARD_ANDRE);
-                                    } else if (fullName.equals("Mario Vivier")) {
-                                        moveCard(cardToMove.getId(), BOARD_MARIO);
+                                    switch (fullName) {
+                                        case "Jessy Therrien" -> moveCard(cardToMove.getId(), BOARD_JESSY);
+                                        case "André Berthiaume" -> moveCard(cardToMove.getId(), BOARD_ANDRE);
+                                        case "Mario Vivier" -> moveCard(cardToMove.getId(), BOARD_MARIO);
                                     }
                                 }
                             }
@@ -182,6 +219,7 @@ public class AgilePlaceClient {
                     }
                 }
             }
+            System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain() FINISH");
         } catch (Exception e) {
             System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() : " + e.getMessage());
 
@@ -200,66 +238,225 @@ public class AgilePlaceClient {
     }
 
     //Mettre ajour une Voie(Lane)
-    private Lane updateALane(int boardId, int laneId, Map<String, Object> propertiesToUpdate) {
+    private void updateALane(int boardId, int laneId, Map<String, Object> propertiesToUpdate) {
         Gson gson = new Gson();
         String json = gson.toJson(propertiesToUpdate);
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.create(json, JSON);
-        String reponseAPI = makeAPICall("/board/" + boardId + "/lane/" + laneId, "PATCH", requestBody);
-        return gson.fromJson(reponseAPI, Lane.class);
+        makeAPICall("/board/" + boardId + "/lane/" + laneId, "PATCH", requestBody);
     }
 
-    // Exemple d'utilisation pour mettre à jour le titre et la description de la voie
-    private void updateLaneTitleAndDescription() {
-        Cards cards = getListOfCardsFromLane(2057018482);
-        Lane laneTitleCompare = getInfoOfLane(CALENDRIER_BOARD,CALENDRIER_LANE_1);
-        List<Semestre.Mois> listMonthCompare = moisAPartirDe(obtenirMoisActuel());
-        LocalDate dateActuelle = LocalDate.now();
+    private Map<String, Integer> createCalendrierDesObjectifs() {
+        Map<String, Integer> createCalendrierDesObjectifs = new HashMap<>();
+        createCalendrierDesObjectifs.put("boardId", ESTIMATION_BOARD);
+        createCalendrierDesObjectifs.put("main_lane", CALENDRIER_LANE);
+        createCalendrierDesObjectifs.put("archive_lane", CALENDRIER_TO_ARCHIVE_GAGNEES);
+        createCalendrierDesObjectifs.put("laneId_1", CALENDRIER_LANE_MONTH_1);
+        createCalendrierDesObjectifs.put("laneId_2", CALENDRIER_LANE_MONTH_2);
+        createCalendrierDesObjectifs.put("laneId_3", CALENDRIER_LANE_MONTH_3);
+        createCalendrierDesObjectifs.put("laneId_4", CALENDRIER_LANE_MONTH_4);
+        createCalendrierDesObjectifs.put("laneId_5", CALENDRIER_LANE_MONTH_5);
+        createCalendrierDesObjectifs.put("laneId_6", CALENDRIER_LANE_MONTH_6);
+        return createCalendrierDesObjectifs;
+    }
+
+    private List<Map<String, Integer>> createCalendrierEnCoursDEstimation() {
+        List<Map<String, Integer>> groupSchedule = new ArrayList<>();
+
+        Map<String, Integer> andreSchedule = new HashMap<>();
+        andreSchedule.put("boardId", ESTIMATION_BOARD);
+        andreSchedule.put("main_lane", CAL_ANDRE_MAIN_LANE);
+        andreSchedule.put("lane_week_enCours", CAL_ANDRE_SEM_EN_COURS);
+        andreSchedule.put("lane_week_2", CAL_ANDRE_SEM_2);
+        andreSchedule.put("lane_week_3", CAL_ANDRE_SEM_3);
+        andreSchedule.put("lane_week_4", CAL_ANDRE_SEM_4);
+
+        groupSchedule.add(andreSchedule);
+
+        Map<String, Integer> jessySchedule = new HashMap<>();
+        jessySchedule.put("boardId", ESTIMATION_BOARD);
+        jessySchedule.put("main_lane", CAL_JESSY_MAIN_LANE);
+        jessySchedule.put("lane_week_enCours", CAL_JESSY_SEM_EN_COURS);
+        jessySchedule.put("lane_week_2", CAL_JESSY_SEM_2);
+        jessySchedule.put("lane_week_3", CAL_JESSY_SEM_3);
+        jessySchedule.put("lane_week_4", CAL_JESSY_SEM_4);
+
+        groupSchedule.add(jessySchedule);
+
+        Map<String, Integer> marioSchedule = new HashMap<>();
+        marioSchedule.put("boardId", ESTIMATION_BOARD);
+        marioSchedule.put("main_lane", CAL_MARIO_MAIN_LANE);
+        marioSchedule.put("lane_week_enCours", CAL_MARIO_SEM_EN_COURS);
+        marioSchedule.put("lane_week_2", CAL_MARIO_SEM_2);
+        marioSchedule.put("lane_week_3", CAL_MARIO_SEM_3);
+        marioSchedule.put("lane_week_4", CAL_MARIO_SEM_4);
+
+        groupSchedule.add(marioSchedule);
+
+        Map<String, Integer> gaetanSchedule = new HashMap<>();
+        gaetanSchedule.put("boardId", ESTIMATION_BOARD);
+        gaetanSchedule.put("main_lane", CAL_GAETAN_MAIN_LANE);
+        gaetanSchedule.put("lane_week_enCours", CAL_GAETAN_SEM_EN_COURS);
+        gaetanSchedule.put("lane_week_2", CAL_GAETAN_SEM_2);
+        gaetanSchedule.put("lane_week_3", CAL_GAETAN_SEM_3);
+        gaetanSchedule.put("lane_week_4", CAL_GAETAN_SEM_4);
+
+        groupSchedule.add(gaetanSchedule);
+        return groupSchedule;
+    }
+
+    public void updateBoardEstimationLaneCalendrierEnCoursDEstimation() {
+        System.out.println("boardEstimationLaneCalendrierEnCoursDEstimation() >>> START");
         try {
-            if (!dateActuelle.getMonth().name().equals(currentMonth) && !laneTitleCompare.getTitle().equals(listMonthCompare.getFirst().name())) {
-                currentMonth = dateActuelle.getMonth().name();
-                List<Semestre.Mois> listMonth = moisAPartirDe(obtenirMoisActuel());
-                Map<String, Integer> calendrierBoardAndLaneMap = new HashMap<>();
-                calendrierBoardAndLaneMap.put("boardId", CALENDRIER_BOARD);
-                calendrierBoardAndLaneMap.put("laneId_1", CALENDRIER_LANE_1);
-                calendrierBoardAndLaneMap.put("laneId_2", CALENDRIER_LANE_2);
-                calendrierBoardAndLaneMap.put("laneId_3", CALENDRIER_LANE_3);
-                calendrierBoardAndLaneMap.put("laneId_4", CALENDRIER_LANE_4);
-                calendrierBoardAndLaneMap.put("laneId_5", CALENDRIER_LANE_5);
-                calendrierBoardAndLaneMap.put("laneId_6", CALENDRIER_LANE_6);
+            List<String> dimancheSemaines = new ArrayList<>();
 
+            // Obtenez une instance du calendrier actuel
+            Calendar calendrier = Calendar.getInstance();
 
-                for (int i = 0; i < calendrierBoardAndLaneMap.size() - 1; i++) {
-                    Map<String, Object> propertiesToUpdate = new HashMap<>();
-                    propertiesToUpdate.put("title", listMonth.get(i));
-                    propertiesToUpdate.put("description", "");
-                    System.out.println("propertiesToUpdate : " + propertiesToUpdate.get("title"));
-                    updateALane(calendrierBoardAndLaneMap.get("boardId"), calendrierBoardAndLaneMap.get("laneId_" + (i + 1)), propertiesToUpdate);
+            // Obtenez le jour actuel de la semaine (dimanche = 1, lundi = 2, ..., samedi = 7)
+            int jourDeLaSemaine = calendrier.get(Calendar.DAY_OF_WEEK);
 
-                    for (Card card : cards.getCards()) {
-                        int moveTo = (i + 5) % 6;
-                        if (moveTo != 5) {
-                            System.out.println("moveTo" + moveTo);
-                            System.out.println("card.getLane().getId()" + card.getLane().getId());
-                            System.out.println("calendrierBoardAndLaneMap.get(\"laneId_\" + i)" + calendrierBoardAndLaneMap.get("laneId_" + (i + 1)));
-                            System.out.println("calendrierBoardAndLaneMap.get(\"laneId_\" + moveTo)" + calendrierBoardAndLaneMap.get("laneId_" + (moveTo + 1)));
+            // Ajustez la semaine pour débuter à partir de la semaine actuelle
+            calendrier.add(Calendar.DAY_OF_MONTH, 1 - jourDeLaSemaine);
 
-                            if (card.getLane().getId().equals(String.valueOf(calendrierBoardAndLaneMap.get("laneId_" + (i + 1))))) {
-                                moveCard(card.getId(), String.valueOf(calendrierBoardAndLaneMap.get("laneId_" + (moveTo + 1))));
-                            }
-                        }
-                    }
+            // Répétez le processus pour les 5 semaines
+            for (int i = 0; i < 5; i++) {
+                // Imprimez la date du dimanche de la semaine i en majuscules
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM", Locale.getDefault());
+                String dateEnMajuscules = dateFormat.format(calendrier.getTime()).toUpperCase();
+                dimancheSemaines.add(dateEnMajuscules);
+                // Déplacez-vous à la première journée de la semaine suivante
+                calendrier.add(Calendar.DAY_OF_MONTH, 7);
+            }
+
+            List<Map<String, Integer>> createCalendrierEnCoursDEstimation = createCalendrierEnCoursDEstimation();
+            Lane laneTitleCompare = getInfoOfLane(
+                    createCalendrierEnCoursDEstimation.getFirst().get("boardId"),
+                    createCalendrierEnCoursDEstimation.getFirst().get("lane_week_enCours"));
+
+            String titreAvantParenthese = laneTitleCompare.getTitle().split(" \\(")[0];
+
+            if (!dimancheSemaines.getFirst().equals(titreAvantParenthese)) {
+
+                for (Map<String, Integer> scedule : createCalendrierEnCoursDEstimation) {
+                    updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(
+                            scedule.get("boardId"),
+                            scedule.get("main_lane"),
+                            scedule.get("lane_week_enCours"),
+                            scedule.get("lane_week_2"),
+                            dimancheSemaines);
+                    updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(
+                            scedule.get("boardId"),
+                            scedule.get("main_lane"),
+                            scedule.get("lane_week_2"),
+                            scedule.get("lane_week_3"),
+                            dimancheSemaines);
+                    updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(
+                            scedule.get("boardId"),
+                            scedule.get("main_lane"),
+                            scedule.get("lane_week_3"),
+                            scedule.get("lane_week_4"),
+                            dimancheSemaines);
                 }
+
             }
         } catch (Exception e) {
-            System.out.println("Une exception spécifique s'est produite dans updateLaneTitleAndDescription() : " + e.getMessage());
+            System.out.println("Une exception spécifique s'est produite dans boardEstimationLaneCalendrierEnCoursDEstimation() : " + e.getMessage());
+        }
+    }
+
+    private void updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(int boardId, int initialLane, int laneMoveTo, int laneWeek, List<String> dimancheSemaines) {
+       try {
+           Cards cards = getListOfCardsFromLane(initialLane);
+           List<Integer> laneEnCours = Arrays.asList(CAL_ANDRE_SEM_EN_COURS, CAL_JESSY_SEM_EN_COURS, CAL_MARIO_SEM_EN_COURS, CAL_GAETAN_SEM_EN_COURS);
+           List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2);
+           List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3);
+           List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4);
+
+           if (laneEnCours.contains(laneMoveTo)) {
+               System.out.println("Premiere condition");
+               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.getFirst() + " (EN COURS)", null);
+               updateALane(boardId, laneMoveTo, propertiesToUpdate);
+           }
+           if (laneSemaine2.contains(laneWeek)) {
+               System.out.println("Deuxieme condition");
+               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(1), null);
+               updateALane(boardId, laneWeek, propertiesToUpdate);
+           }
+
+           if (laneSemaine3.contains(laneWeek)) {
+               System.out.println("Troisieme condition");
+               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(2), null);
+               updateALane(boardId, laneWeek, propertiesToUpdate);
+           }
+           if (laneSemaine4.contains(laneWeek)) {
+               System.out.println("Quatrieme condition");
+               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(3), null);
+               updateALane(boardId, laneWeek, propertiesToUpdate);
+           }
+
+           if (cards != null) {
+               for (Card card : cards.getCards()) {
+                   if (card.getLane().getId().equals(valueOf(laneWeek))) {
+                       System.out.println("Accept Condition");
+                       moveCard(card.getId(), String.valueOf(laneMoveTo));
+                   }
+               }
+           }
+       }catch(Exception e){
+           System.out.println("Une exception spécifique s'est produite dans updateTitleAndDescriptionOfCalendrierEnCoursDEstimation() : " + e.getMessage());
+       }
+    }
+
+    private Map<String, Object> setTitleAndDescriptionOfLane(String newTitle, String newDescription) {
+        Map<String, Object> propertiesToSet = new HashMap<>();
+        propertiesToSet.put("title", newTitle);
+        propertiesToSet.put("description", newDescription);
+        return propertiesToSet;
+    }
+
+    public void updateBoardEstimationLaneCalendrierDesObjectifs() {
+        System.out.println("updateBoardEstimationLaneCalendrierDesObjectifs() >>> START");
+        try {
+            Map<String, Integer> createCalendrierDesObjectifs = createCalendrierDesObjectifs();
+            Lane laneTitleCompare = getInfoOfLane(createCalendrierDesObjectifs.get("boardId"), createCalendrierDesObjectifs.get("laneId_1"));
+            List<Semestre.Mois> listMonthCompare = moisAPartirDe(obtenirMoisActuel());
+            LocalDate dateActuelle = LocalDate.now();
+            if (!dateActuelle.getMonth().name().equals(currentMonth) && !laneTitleCompare.getTitle().equals(listMonthCompare.getFirst().name())) {
+                currentMonth = dateActuelle.getMonth().name();
+                updateLaneTitleAndDescriptionOfCalendrierDesObjectifs(createCalendrierDesObjectifs);
+            }
+            System.out.println("updateBoardEstimationLaneCalendrierDesObjectifs() >>> FINISH");
+        } catch (Exception e) {
+            System.out.println("Une exception spécifique s'est produite dans updateBoardEstimationLaneCalendrierDesObjectifs() : " + e.getMessage());
         }
     }
 
     //Calendrier automatisation
-    public void calenderAutomate() {
-        updateLaneTitleAndDescription();
-        System.out.println("calenderAutomate() FINISH");
+    private void updateLaneTitleAndDescriptionOfCalendrierDesObjectifs(Map<String, Integer> createCalendrier) {
+        try {
+            List<Semestre.Mois> listMonth = moisAPartirDe(obtenirMoisActuel());
+            Cards cards = getListOfCardsFromLane(createCalendrier.get("main_lane"));
+            for (int i = 0; i < createCalendrier.size() - 1; i++) {
+                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(String.valueOf(listMonth.get(i)), null);
+                updateALane(createCalendrier.get("boardId"), createCalendrier.get("laneId_" + (i + 1)), propertiesToUpdate);
+                for (Card card : cards.getCards()) {
+                    int moveTo = (i + 5) % 6;
+                    if (moveTo == 5) {
+                        if (card.getLane().getId().equals(valueOf(createCalendrier.get("laneId_" + (i + 1))))) {
+                            moveCard(card.getId(), valueOf(createCalendrier.get("archive_lane")));
+                        }
+                    }
+                    if (moveTo != 5) {
+                        if (card.getLane().getId().equals(valueOf(createCalendrier.get("laneId_" + (i + 1))))) {
+                            moveCard(card.getId(), valueOf(createCalendrier.get("laneId_" + (moveTo + 1))));
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            System.out.println("Une exception spécifique s'est produite dans updateLaneTitleAndDescriptionOfCalendrierDesObjectifs() : " + e.getMessage());
+        }
     }
 
 
