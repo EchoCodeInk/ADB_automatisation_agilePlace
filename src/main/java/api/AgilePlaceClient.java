@@ -526,11 +526,10 @@ public class AgilePlaceClient {
 
 
     }
-
-
+    
     public void updateAttachmentForMagasinCheckList() {
         System.out.println("updateAttachmentForMagasinCheckList");
-        envoyerSMS("5147788120","test salut");
+        //envoyerSMS("5147788120","test salut");
     }
 
     public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
