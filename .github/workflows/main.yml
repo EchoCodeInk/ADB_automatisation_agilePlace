@@ -1,30 +1,37 @@
-#name: Workflow Java
+name: ADB_Automatisation
 
-#on: [push] # Déclenche le workflow lors d'un push
+on:
+  repository_dispatch:
+    types: [deploy-new-build]
 
-#jobs:
-  #build:
-    #runs-on: ubuntu-latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    #steps:
-    #- name: Checkout du code
-      #uses: actions/checkout@v2
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v2
 
-    #- name: Configurer Java
-      #uses: actions/setup-java@v2
-      #with:
-        #java-version: '21'
-        #distribution: 'adopt'
+    - name: Configurer Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'  # Modifiez la version Java selon vos besoins
+        distribution: 'adopt'
         
-    #- name: Installer Apache Maven
-      #run: sudo apt-get install -y maven
+    - name: Installer Apache Maven
+      run: sudo apt-get install -y maven
 
-    #- name: Compilation et Tests
-      #run: mvn clean install -B
+    - name: Compilation et Tests
+      run: mvn clean install -B
   
-    #- name: Exécution du programme avec Maven
-      #run: mvn exec:java -Dexec.mainClass="Main" -B
+    - name: Exécution du programme avec Maven
+      run: mvn exec:java -Dexec.mainClass="Main" -B
 
-
-
-
+    - name: Notify AgilePlace
+      run: |
+        # Ajoutez ici les commandes pour notifier AgilePlace avec les informations de client_payload
+        echo "Description: ${{ github.event.client_payload.automation.description }}"
+        echo "Branch Name: ${{ github.event.client_payload.card.customFieldsByLabel.branch-name }}"
+        echo "Project Name: ${{ github.event.client_payload.card.customFieldsByLabel.project-name }}"
+        
+        # Ajoutez vos commandes pour interagir avec AgilePlace en fonction de vos besoins
