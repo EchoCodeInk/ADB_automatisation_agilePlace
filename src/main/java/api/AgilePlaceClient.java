@@ -16,13 +16,14 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static api.EnvoiSMS.envoyerSMS;
 import static java.lang.String.valueOf;
 import static model.Semestre.Mois.moisAPartirDe;
 import static model.Semestre.obtenirMoisActuel;
 
 public class AgilePlaceClient {
     private OkHttpClient client;
-    private AgilePlaceConnector apiConnector;
+    private final AgilePlaceConnector apiConnector;
     private static final int TOO_MANY_REQUESTS = 429;
     private static final int REQUEST_DELAY_MS = 500;
 
@@ -39,8 +40,7 @@ public class AgilePlaceClient {
 
     // Attribut pour le "CALENDRIER DES OBJECTIFS" du board "ESTIMATION"
     String currentMonth;
-    private static final int BOARD_ESTIMATION = 1954823342;
-    private static final int BOARD_ESTIMATION_LANE_CALENDRIER = 2072271545;
+    private final int BOARD_ESTIMATION = 1954823342;
     private int CALENDRIER_LANE_MONTH_1 = 2072107008;
     private int CALENDRIER_LANE_MONTH_2 = 2072107009;
     private int CALENDRIER_LANE_MONTH_3 = 2072107010;
@@ -54,22 +54,22 @@ public class AgilePlaceClient {
     private int CAL_JESSY_MAIN_LANE = 2043624709;
     private int CAL_MARIO_MAIN_LANE = 2043624714;
     private int CAL_GAETAN_MAIN_LANE = 2074240317;
-    private int CAL_ANDRE_SEM_1 = 2063557856;
-    private int CAL_JESSY_SEM_1 = 2063557858;
-    private int CAL_MARIO_SEM_1 = 2063557860;
-    private int CAL_GAETAN_SEM_1 = 2074240315;
-    private int CAL_ANDRE_SEM_2 = 2063557857;
-    private int CAL_JESSY_SEM_2 = 2063557859;
-    private int CAL_MARIO_SEM_2 = 2063557861;
-    private int CAL_GAETAN_SEM_2 = 2074240316;
-    private int CAL_ANDRE_SEM_3 = 2074260484;
-    private int CAL_JESSY_SEM_3 = 2074260485;
-    private int CAL_MARIO_SEM_3 = 2074260487;
-    private int CAL_GAETAN_SEM_3 = 2074260487;
-    private int CAL_ANDRE_SEM_4 = 2075643759;
-    private int CAL_JESSY_SEM_4 = 2075643760;
-    private int CAL_MARIO_SEM_4 = 2075643761;
-    private int CAL_GAETAN_SEM_4 = 2075551143;
+    private final int CAL_ANDRE_SEM_1 = 2063557856;
+    private final int CAL_JESSY_SEM_1 = 2063557858;
+    private final int CAL_MARIO_SEM_1 = 2063557860;
+    private final int CAL_GAETAN_SEM_1 = 2074240315;
+    private final int CAL_ANDRE_SEM_2 = 2063557857;
+    private final int CAL_JESSY_SEM_2 = 2063557859;
+    private final int CAL_MARIO_SEM_2 = 2063557861;
+    private final int CAL_GAETAN_SEM_2 = 2074240316;
+    private final int CAL_ANDRE_SEM_3 = 2074260484;
+    private final int CAL_JESSY_SEM_3 = 2074260485;
+    private final int CAL_MARIO_SEM_3 = 2074260487;
+    private final int CAL_GAETAN_SEM_3 = 2074260487;
+    private final int CAL_ANDRE_SEM_4 = 2075643759;
+    private final int CAL_JESSY_SEM_4 = 2075643760;
+    private final int CAL_MARIO_SEM_4 = 2075643761;
+    private final int CAL_GAETAN_SEM_4 = 2075551143;
 
     public AgilePlaceClient() {
         this.apiConnector = new AgilePlaceConnector();
@@ -253,6 +253,7 @@ public class AgilePlaceClient {
     private Map<String, Integer> createCalendrierDesObjectifs() {
         Map<String, Integer> createCalendrierDesObjectifs = new HashMap<>();
         createCalendrierDesObjectifs.put("boardId", BOARD_ESTIMATION);
+        int BOARD_ESTIMATION_LANE_CALENDRIER = 2072271545;
         createCalendrierDesObjectifs.put("main_lane", BOARD_ESTIMATION_LANE_CALENDRIER);
         createCalendrierDesObjectifs.put("archive_lane", CALENDRIER_TO_ARCHIVE_GAGNEES);
         createCalendrierDesObjectifs.put("laneId_1", CALENDRIER_LANE_MONTH_1);
@@ -520,7 +521,7 @@ public class AgilePlaceClient {
 
     public void updateAttachmentForMagasinCheckList() {
         System.out.println("updateAttachmentForMagasinCheckList");
-        CardEvent cardEvent = getActivityFromCard("2057018512");
+        envoyerSMS("5147788120","test salut");
     }
 
     public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
