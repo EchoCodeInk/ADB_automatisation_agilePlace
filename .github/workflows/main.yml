@@ -25,8 +25,7 @@ jobs:
           echo "API_JETON_KEY=${{ secrets.API_JETON_KEY }}" >> $GITHUB_ENV
           echo "API_BASE_URL=${{ secrets.SMS_ACCOUNT_SID }}" >> $GITHUB_ENV
           echo "API_JETON_KEY=${{ secrets.SMS_AUTH_TOKEN }}" >> $GITHUB_ENV
-
-
+          
     - name: Compilation et Tests
       run: mvn clean install -B
   
