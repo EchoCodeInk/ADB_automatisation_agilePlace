@@ -13,11 +13,11 @@ public class ProgrammeController {
 
     public void startProgramme() {
         System.out.println("START PROGRAMME ");
-        //agilePlaceController.updateAttachmentForMagasinCheckList();
-        agilePlaceController.gestionDuplicateCardInLanes();
-        agilePlaceController.gestionCardSylvain();
-        agilePlaceController.updateBoardEstimationLaneCalendrierDesObjectifsUpdate();
-        agilePlaceController.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
+          agilePlaceController.updateAttachmentForMagasinCheckList();
+//        agilePlaceController.gestionDuplicateCardInLanes();
+//        agilePlaceController.gestionCardSylvain();
+//        agilePlaceController.updateBoardEstimationLaneCalendrierDesObjectifsUpdate();
+//        agilePlaceController.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
     }
 
 

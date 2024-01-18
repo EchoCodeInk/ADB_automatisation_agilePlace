@@ -23,7 +23,7 @@ import static model.Semestre.obtenirMoisActuel;
 
 public class AgilePlaceClient {
     private OkHttpClient client;
-    private final AgilePlaceConnector apiConnector;
+    private AgilePlaceConnector apiConnector;
     private static final int TOO_MANY_REQUESTS = 429;
     private static final int REQUEST_DELAY_MS = 500;
 
