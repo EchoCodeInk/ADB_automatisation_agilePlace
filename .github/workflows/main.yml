@@ -23,8 +23,8 @@ jobs:
       run: mvn clean install -B
   
     - name: Exécution du programme avec Maven
-      run: mvn exec:src/main/java/Main.java
-
+      run: mvn exec:java -Dexec.mainClass="Main"
+      
     - name: Notify AgilePlace
       run: |
         # Ajoutez ici les commandes pour notifier AgilePlace avec les informations de client_payload
