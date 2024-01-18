@@ -6,14 +6,16 @@ import com.google.gson.Gson;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
+
+import java.io.File;
 import java.io.IOException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.fasterxml.jackson.databind.cfg.CoercionInputShape.Array;
 import static java.lang.String.valueOf;
 import static model.Semestre.Mois.moisAPartirDe;
 import static model.Semestre.obtenirMoisActuel;
@@ -25,16 +27,20 @@ public class AgilePlaceClient {
     private static final int REQUEST_DELAY_MS = 500;
 
     // Attribut pour la gestion des estimations terminer de Sylvain
-    private int BOARD_CRM_VERIfICATION_TERMINE = 2055641730;
-    private int BOARD_ESTIMATION_VERIfICATION_SYLVAIN = 2063614479;
-    private String BOARD_ANDRE = "2070706294";
-    private String BOARD_JESSY = "2070706296";
-    private String BOARD_MARIO = "2070706298";
+    private static final int BOARD_CRM_VERIfICATION_TERMINE = 2055641730;
+    private static final int BOARD_ESTIMATION_VERIfICATION_SYLVAIN = 2063614479;
+    private static final String BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_ANDRE = "2070706294";
+    private static final String BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_JESSY = "2070706296";
+    private static final String BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_MARIO = "2070706298";
+    private static final String BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_GAETAN = "2074228815";
+    private static final int BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN = 2063637759;
+    private static final int BOARD_CRM_LANE_SUIVI_ESTIMATION = 2075694230;
+    private static final int BOARD_ESTIMATION_LANE_ARCHIVE = 1907499860;
 
     // Attribut pour le "CALENDRIER DES OBJECTIFS" du board "ESTIMATION"
     String currentMonth;
-    private int ESTIMATION_BOARD = 1954823342;
-    private int CALENDRIER_LANE = 2072271545;
+    private static final int BOARD_ESTIMATION = 1954823342;
+    private static final int BOARD_ESTIMATION_LANE_CALENDRIER = 2072271545;
     private int CALENDRIER_LANE_MONTH_1 = 2072107008;
     private int CALENDRIER_LANE_MONTH_2 = 2072107009;
     private int CALENDRIER_LANE_MONTH_3 = 2072107010;
@@ -44,27 +50,26 @@ public class AgilePlaceClient {
     private int CALENDRIER_TO_ARCHIVE_GAGNEES = 2058436638;
 
     //Attribut pour le calendrier "EN COURS D'ESTIMATION" du board "ESTIMATION"
-
     private int CAL_ANDRE_MAIN_LANE = 2043380283;
     private int CAL_JESSY_MAIN_LANE = 2043624709;
     private int CAL_MARIO_MAIN_LANE = 2043624714;
     private int CAL_GAETAN_MAIN_LANE = 2074240317;
-    private int CAL_ANDRE_SEM_EN_COURS = 2043380284;
-    private int CAL_JESSY_SEM_EN_COURS = 2043380285;
-    private int CAL_MARIO_SEM_EN_COURS = 2043380286;
-    private int CAL_GAETAN_SEM_EN_COURS = 2074240312;
-    private int CAL_ANDRE_SEM_2 = 2063557856;
-    private int CAL_ANDRE_SEM_3 = 2063557857;
-    private int CAL_ANDRE_SEM_4 = 2074260484;
-    private int CAL_JESSY_SEM_2 = 2063557858;
-    private int CAL_JESSY_SEM_3 = 2063557859;
-    private int CAL_JESSY_SEM_4 = 2074260485;
-    private int CAL_MARIO_SEM_2 = 2063557860;
-    private int CAL_MARIO_SEM_3 = 2063557861;
-    private int CAL_MARIO_SEM_4 = 2074260486;
-    private int CAL_GAETAN_SEM_2 = 2074240315;
-    private int CAL_GAETAN_SEM_3 = 2074240316;
-    private int CAL_GAETAN_SEM_4 = 2074260487;
+    private int CAL_ANDRE_SEM_1 = 2063557856;
+    private int CAL_JESSY_SEM_1 = 2063557858;
+    private int CAL_MARIO_SEM_1 = 2063557860;
+    private int CAL_GAETAN_SEM_1 = 2074240315;
+    private int CAL_ANDRE_SEM_2 = 2063557857;
+    private int CAL_JESSY_SEM_2 = 2063557859;
+    private int CAL_MARIO_SEM_2 = 2063557861;
+    private int CAL_GAETAN_SEM_2 = 2074240316;
+    private int CAL_ANDRE_SEM_3 = 2074260484;
+    private int CAL_JESSY_SEM_3 = 2074260485;
+    private int CAL_MARIO_SEM_3 = 2074260487;
+    private int CAL_GAETAN_SEM_3 = 2074260487;
+    private int CAL_ANDRE_SEM_4 = 2075643759;
+    private int CAL_JESSY_SEM_4 = 2075643760;
+    private int CAL_MARIO_SEM_4 = 2075643761;
+    private int CAL_GAETAN_SEM_4 = 2075551143;
 
     public AgilePlaceClient() {
         this.apiConnector = new AgilePlaceConnector();
@@ -163,10 +168,11 @@ public class AgilePlaceClient {
     private void handleErrorResponse(Response response) {
         System.out.println("Une exception spécifique s'est produite dans handleErrorResponse() : " + response);
     }
+
     private void handleException(Exception e) {
-        e.printStackTrace();
-        // Logique pour gérer les exceptions ici
+        System.out.println("Une exception s'est produite" + e.getMessage());
     }
+
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
@@ -189,29 +195,28 @@ public class AgilePlaceClient {
 
     //Deplacement des cartes enfant
     public void moveCardOfBoardEstimationOfTheLaneSylvain() {
-        System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain() START");
+        System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain()");
         Cards cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
         Cards cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
-
+        Cards verificationForDuplicatecards = getListOfCardsFromLane(2055700927);
         List<Card> cardList = cards.getCards();
         List<Card> cardList2 = cards2.getCards();
+
         try {
             if (cardList != null && !cardList.isEmpty()) {
                 for (Card cardFromList : cardList) {
                     Card cardToMove = getInfoCard(cardFromList.getId());
-
                     if (cardList2 != null) {
                         for (Card cardFromList2 : cardList2) {
-
                             Card cardCompare = getInfoCard(cardFromList2.getId());
-
                             if (cardCompare != null && cardCompare.getCustomId().getValue().equals(cardToMove.getCustomId().getValue())) {
                                 for (AssignedUser assignedUser : cardToMove.getAssignedUsers()) {
                                     String fullName = assignedUser.getFullName();
                                     switch (fullName) {
-                                        case "Jessy Therrien" -> moveCard(cardToMove.getId(), BOARD_JESSY);
-                                        case "André Berthiaume" -> moveCard(cardToMove.getId(), BOARD_ANDRE);
-                                        case "Mario Vivier" -> moveCard(cardToMove.getId(), BOARD_MARIO);
+                                        case "Jessy Therrien" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_JESSY);
+                                        case "André Berthiaume" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_ANDRE);
+                                        case "Mario Vivier" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_MARIO);
+                                        case "Gaétan Dussault" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_GAETAN);
                                     }
                                 }
                             }
@@ -219,13 +224,12 @@ public class AgilePlaceClient {
                     }
                 }
             }
-            System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain() FINISH");
+
+            findDuplicateCardInLane(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
         } catch (Exception e) {
-            System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() : " + e.getMessage());
-
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() " + e.getMessage());
         }
-
-
     }
 
     private Lane getInfoOfLane(int boardId, int laneId) {
@@ -248,8 +252,8 @@ public class AgilePlaceClient {
 
     private Map<String, Integer> createCalendrierDesObjectifs() {
         Map<String, Integer> createCalendrierDesObjectifs = new HashMap<>();
-        createCalendrierDesObjectifs.put("boardId", ESTIMATION_BOARD);
-        createCalendrierDesObjectifs.put("main_lane", CALENDRIER_LANE);
+        createCalendrierDesObjectifs.put("boardId", BOARD_ESTIMATION);
+        createCalendrierDesObjectifs.put("main_lane", BOARD_ESTIMATION_LANE_CALENDRIER);
         createCalendrierDesObjectifs.put("archive_lane", CALENDRIER_TO_ARCHIVE_GAGNEES);
         createCalendrierDesObjectifs.put("laneId_1", CALENDRIER_LANE_MONTH_1);
         createCalendrierDesObjectifs.put("laneId_2", CALENDRIER_LANE_MONTH_2);
@@ -264,9 +268,9 @@ public class AgilePlaceClient {
         List<Map<String, Integer>> groupSchedule = new ArrayList<>();
 
         Map<String, Integer> andreSchedule = new HashMap<>();
-        andreSchedule.put("boardId", ESTIMATION_BOARD);
+        andreSchedule.put("boardId", BOARD_ESTIMATION);
         andreSchedule.put("main_lane", CAL_ANDRE_MAIN_LANE);
-        andreSchedule.put("lane_week_enCours", CAL_ANDRE_SEM_EN_COURS);
+        andreSchedule.put("lane_week_1", CAL_ANDRE_SEM_1);
         andreSchedule.put("lane_week_2", CAL_ANDRE_SEM_2);
         andreSchedule.put("lane_week_3", CAL_ANDRE_SEM_3);
         andreSchedule.put("lane_week_4", CAL_ANDRE_SEM_4);
@@ -274,9 +278,9 @@ public class AgilePlaceClient {
         groupSchedule.add(andreSchedule);
 
         Map<String, Integer> jessySchedule = new HashMap<>();
-        jessySchedule.put("boardId", ESTIMATION_BOARD);
+        jessySchedule.put("boardId", BOARD_ESTIMATION);
         jessySchedule.put("main_lane", CAL_JESSY_MAIN_LANE);
-        jessySchedule.put("lane_week_enCours", CAL_JESSY_SEM_EN_COURS);
+        jessySchedule.put("lane_week_1", CAL_JESSY_SEM_1);
         jessySchedule.put("lane_week_2", CAL_JESSY_SEM_2);
         jessySchedule.put("lane_week_3", CAL_JESSY_SEM_3);
         jessySchedule.put("lane_week_4", CAL_JESSY_SEM_4);
@@ -284,9 +288,9 @@ public class AgilePlaceClient {
         groupSchedule.add(jessySchedule);
 
         Map<String, Integer> marioSchedule = new HashMap<>();
-        marioSchedule.put("boardId", ESTIMATION_BOARD);
+        marioSchedule.put("boardId", BOARD_ESTIMATION);
         marioSchedule.put("main_lane", CAL_MARIO_MAIN_LANE);
-        marioSchedule.put("lane_week_enCours", CAL_MARIO_SEM_EN_COURS);
+        marioSchedule.put("lane_week_1", CAL_MARIO_SEM_1);
         marioSchedule.put("lane_week_2", CAL_MARIO_SEM_2);
         marioSchedule.put("lane_week_3", CAL_MARIO_SEM_3);
         marioSchedule.put("lane_week_4", CAL_MARIO_SEM_4);
@@ -294,9 +298,9 @@ public class AgilePlaceClient {
         groupSchedule.add(marioSchedule);
 
         Map<String, Integer> gaetanSchedule = new HashMap<>();
-        gaetanSchedule.put("boardId", ESTIMATION_BOARD);
+        gaetanSchedule.put("boardId", BOARD_ESTIMATION);
         gaetanSchedule.put("main_lane", CAL_GAETAN_MAIN_LANE);
-        gaetanSchedule.put("lane_week_enCours", CAL_GAETAN_SEM_EN_COURS);
+        gaetanSchedule.put("lane_week_1", CAL_GAETAN_SEM_1);
         gaetanSchedule.put("lane_week_2", CAL_GAETAN_SEM_2);
         gaetanSchedule.put("lane_week_3", CAL_GAETAN_SEM_3);
         gaetanSchedule.put("lane_week_4", CAL_GAETAN_SEM_4);
@@ -306,7 +310,6 @@ public class AgilePlaceClient {
     }
 
     public void updateBoardEstimationLaneCalendrierEnCoursDEstimation() {
-        System.out.println("boardEstimationLaneCalendrierEnCoursDEstimation() >>> START");
         try {
             List<String> dimancheSemaines = new ArrayList<>();
 
@@ -332,17 +335,15 @@ public class AgilePlaceClient {
             List<Map<String, Integer>> createCalendrierEnCoursDEstimation = createCalendrierEnCoursDEstimation();
             Lane laneTitleCompare = getInfoOfLane(
                     createCalendrierEnCoursDEstimation.getFirst().get("boardId"),
-                    createCalendrierEnCoursDEstimation.getFirst().get("lane_week_enCours"));
+                    createCalendrierEnCoursDEstimation.getFirst().get("lane_week_1"));
 
-            String titreAvantParenthese = laneTitleCompare.getTitle().split(" \\(")[0];
-
-            if (!dimancheSemaines.getFirst().equals(titreAvantParenthese)) {
+            if (!dimancheSemaines.getFirst().equals(laneTitleCompare.getTitle())) {
 
                 for (Map<String, Integer> scedule : createCalendrierEnCoursDEstimation) {
                     updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(
                             scedule.get("boardId"),
                             scedule.get("main_lane"),
-                            scedule.get("lane_week_enCours"),
+                            scedule.get("lane_week_1"),
                             scedule.get("lane_week_2"),
                             dimancheSemaines);
                     updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(
@@ -361,51 +362,53 @@ public class AgilePlaceClient {
 
             }
         } catch (Exception e) {
-            System.out.println("Une exception spécifique s'est produite dans boardEstimationLaneCalendrierEnCoursDEstimation() : " + e.getMessage());
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans updateBoardEstimationLaneCalendrierEnCoursDEstimation() " + e.getMessage());
         }
     }
 
     private void updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(int boardId, int initialLane, int laneMoveTo, int laneWeek, List<String> dimancheSemaines) {
-       try {
-           Cards cards = getListOfCardsFromLane(initialLane);
-           List<Integer> laneEnCours = Arrays.asList(CAL_ANDRE_SEM_EN_COURS, CAL_JESSY_SEM_EN_COURS, CAL_MARIO_SEM_EN_COURS, CAL_GAETAN_SEM_EN_COURS);
-           List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2);
-           List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3);
-           List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4);
+        try {
+            Cards cards = getListOfCardsFromLane(initialLane);
+            List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1);
+            List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2);
+            List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3);
+            List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4);
 
-           if (laneEnCours.contains(laneMoveTo)) {
-               System.out.println("Premiere condition");
-               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.getFirst() + " (EN COURS)", null);
-               updateALane(boardId, laneMoveTo, propertiesToUpdate);
-           }
-           if (laneSemaine2.contains(laneWeek)) {
-               System.out.println("Deuxieme condition");
-               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(1), null);
-               updateALane(boardId, laneWeek, propertiesToUpdate);
-           }
+            if (laneSemaine1.contains(laneMoveTo)) {
+                //System.out.println("Premiere condition");
+                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.getFirst(), null);
+                updateALane(boardId, laneMoveTo, propertiesToUpdate);
+            }
+            if (laneSemaine2.contains(laneWeek)) {
+                //System.out.println("Deuxieme condition");
+                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(1), null);
+                updateALane(boardId, laneWeek, propertiesToUpdate);
+            }
 
-           if (laneSemaine3.contains(laneWeek)) {
-               System.out.println("Troisieme condition");
-               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(2), null);
-               updateALane(boardId, laneWeek, propertiesToUpdate);
-           }
-           if (laneSemaine4.contains(laneWeek)) {
-               System.out.println("Quatrieme condition");
-               Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(3), null);
-               updateALane(boardId, laneWeek, propertiesToUpdate);
-           }
+            if (laneSemaine3.contains(laneWeek)) {
+                //System.out.println("Troisieme condition");
+                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(2), null);
+                updateALane(boardId, laneWeek, propertiesToUpdate);
+            }
+            if (laneSemaine4.contains(laneWeek)) {
+                //System.out.println("Quatrieme condition");
+                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(3), null);
+                updateALane(boardId, laneWeek, propertiesToUpdate);
+            }
 
-           if (cards != null) {
-               for (Card card : cards.getCards()) {
-                   if (card.getLane().getId().equals(valueOf(laneWeek))) {
-                       System.out.println("Accept Condition");
-                       moveCard(card.getId(), String.valueOf(laneMoveTo));
-                   }
-               }
-           }
-       }catch(Exception e){
-           System.out.println("Une exception spécifique s'est produite dans updateTitleAndDescriptionOfCalendrierEnCoursDEstimation() : " + e.getMessage());
-       }
+            if (cards != null) {
+                for (Card card : cards.getCards()) {
+                    if (card.getLane().getId().equals(valueOf(laneWeek))) {
+                        //System.out.println("Accept Condition");
+                        moveCard(card.getId(), String.valueOf(laneMoveTo));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans updateTitleAndDescriptionOfCalendrierEnCoursDEstimation() " + e.getMessage());
+        }
     }
 
     private Map<String, Object> setTitleAndDescriptionOfLane(String newTitle, String newDescription) {
@@ -426,9 +429,9 @@ public class AgilePlaceClient {
                 currentMonth = dateActuelle.getMonth().name();
                 updateLaneTitleAndDescriptionOfCalendrierDesObjectifs(createCalendrierDesObjectifs);
             }
-            System.out.println("updateBoardEstimationLaneCalendrierDesObjectifs() >>> FINISH");
         } catch (Exception e) {
-            System.out.println("Une exception spécifique s'est produite dans updateBoardEstimationLaneCalendrierDesObjectifs() : " + e.getMessage());
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans updateLaneTitleAndDescriptionOfCalendrierDesObjectifs() " + e.getMessage());
         }
     }
 
@@ -454,11 +457,92 @@ public class AgilePlaceClient {
                     }
                 }
             }
-        }catch(Exception e){
-            System.out.println("Une exception spécifique s'est produite dans updateLaneTitleAndDescriptionOfCalendrierDesObjectifs() : " + e.getMessage());
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans updateLaneTitleAndDescriptionOfCalendrierDesObjectifs() " + e.getMessage());
         }
     }
 
+    private AttachmentInfo getAListOfAttachementsForACard(int cardId) {
+        Gson gson = new Gson();
+        String stringAttachement = makeAPICall("/card/" + cardId + "/attachment/", "GET", null);
+        return gson.fromJson(stringAttachement, AttachmentInfo.class);
+    }
+
+    private AttachmentInfo getAnAttachementsContentsForACard(int cardId, int attachmentId) {
+        Gson gson = new Gson();
+        String stringAttachement = makeAPICall("/card/" + cardId + "/attachment/" + attachmentId + "/content", "GET", null);
+        return gson.fromJson(stringAttachement, AttachmentInfo.class);
+    }
+
+    private void createAnAttachment(int cardId, File file, String description) {
+        try {
+            RequestBody requestBody = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("description", description)
+                    .addFormDataPart("file", file.getName(),
+                            RequestBody.create(MediaType.parse("application/octet-stream"), file))
+                    .build();
+            makeAPICall("/card/" + cardId + "/attachment", "POST", requestBody);
+        } catch (Exception e) {
+            System.out.println("Une exception spécifique s'est produite dans createAnAttachment() " + e.getMessage());
+        }
+    }
+
+    private void deleteAnAttachment(int cardId, int attachmentId) {
+        try {
+            RequestBody requestBody = RequestBody.create(null, new byte[0]);
+
+            makeAPICall("/card/" + cardId + "/attachment/" + attachmentId, "DELETE", requestBody);
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans deleteAnAttachment() " + e.getMessage());
+        }
+    }
+
+    private void findDuplicateCardInLane(List<Card> array, int laneArchive) {
+        Set<String> uniqueElements = new HashSet<>();
+        for (Card card : array) {
+            if (!uniqueElements.add(card.getCustomId().getValue())) {
+                moveCard(card.getId(), String.valueOf(laneArchive));
+            }
+        }
+    }
+
+    public void findDuplicateCardInLanes() {
+        int USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE = 1897212305;
+        int USINE_ADB_ARCHIVES_LANE = 1823767913;
+        Cards laneCards = getListOfCardsFromLane(USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE);
+        findDuplicateCardInLane(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
+
+    }
+
+
+    public void updateAttachmentForMagasinCheckList() {
+        System.out.println("updateAttachmentForMagasinCheckList");
+        CardEvent cardEvent = getActivityFromCard("2057018512");
+    }
+
+    public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
+        try {
+
+            Cards suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);
+            Cards crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
+            List<String> costumIdJobs = new ArrayList<>();
+            System.out.println("reflectionOfBoardEstimationLainSuiviEstimationSylvain()");
+            for (Card card : suiviEstimationSylvainCards.getCards()) {
+                costumIdJobs.add(card.getCustomId().getValue());
+            }
+            for (Card card : crmSuiviSylvainCards.getCards()) {
+                if (!costumIdJobs.contains(card.getCustomId().getValue())) {
+                    moveCard(card.getId(), "1907499860");
+                }
+            }
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans reflectionOfBoardEstimationLainSuiviEstimationSylvain() " + e.getMessage());
+        }
+    }
 
     private CardEvent getActivityFromCard(String cardId) {
         String activityString = makeAPICall("/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
