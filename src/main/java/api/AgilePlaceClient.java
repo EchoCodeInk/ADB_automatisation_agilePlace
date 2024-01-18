@@ -195,6 +195,7 @@ public class AgilePlaceClient {
 
     //Deplacement des cartes enfant
     public void moveCardOfBoardEstimationOfTheLaneSylvain() {
+        try {
         System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain()");
         Cards cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
         Cards cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
@@ -202,11 +203,11 @@ public class AgilePlaceClient {
         List<Card> cardList = cards.getCards();
         List<Card> cardList2 = cards2.getCards();
 
-        try {
-            if (cardList != null && !cardList.isEmpty()) {
+
+            if (!cardList.isEmpty()) {
                 for (Card cardFromList : cardList) {
                     Card cardToMove = getInfoCard(cardFromList.getId());
-                    if (cardList2 != null) {
+                    if (!cardList2.isEmpty()) {
                         for (Card cardFromList2 : cardList2) {
                             Card cardCompare = getInfoCard(cardFromList2.getId());
                             if (cardCompare != null && cardCompare.getCustomId().getValue().equals(cardToMove.getCustomId().getValue())) {
@@ -371,38 +372,40 @@ public class AgilePlaceClient {
     private void updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(int boardId, int initialLane, int laneMoveTo, int laneWeek, List<String> dimancheSemaines) {
         try {
             Cards cards = getListOfCardsFromLane(initialLane);
-            List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1);
-            List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2);
-            List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3);
-            List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4);
-
-            if (laneSemaine1.contains(laneMoveTo)) {
-                //System.out.println("Premiere condition");
-                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.getFirst(), null);
-                updateALane(boardId, laneMoveTo, propertiesToUpdate);
-            }
-            if (laneSemaine2.contains(laneWeek)) {
-                //System.out.println("Deuxieme condition");
-                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(1), null);
-                updateALane(boardId, laneWeek, propertiesToUpdate);
-            }
-
-            if (laneSemaine3.contains(laneWeek)) {
-                //System.out.println("Troisieme condition");
-                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(2), null);
-                updateALane(boardId, laneWeek, propertiesToUpdate);
-            }
-            if (laneSemaine4.contains(laneWeek)) {
-                //System.out.println("Quatrieme condition");
-                Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(3), null);
-                updateALane(boardId, laneWeek, propertiesToUpdate);
-            }
-
             if (cards != null) {
-                for (Card card : cards.getCards()) {
-                    if (card.getLane().getId().equals(valueOf(laneWeek))) {
-                        //System.out.println("Accept Condition");
-                        moveCard(card.getId(), String.valueOf(laneMoveTo));
+                List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1);
+                List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2);
+                List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3);
+                List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4);
+
+                if (laneSemaine1.contains(laneMoveTo)) {
+                    //System.out.println("Premiere condition");
+                    Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.getFirst(), null);
+                    updateALane(boardId, laneMoveTo, propertiesToUpdate);
+                }
+                if (laneSemaine2.contains(laneWeek)) {
+                    //System.out.println("Deuxieme condition");
+                    Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(1), null);
+                    updateALane(boardId, laneWeek, propertiesToUpdate);
+                }
+
+                if (laneSemaine3.contains(laneWeek)) {
+                    //System.out.println("Troisieme condition");
+                    Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(2), null);
+                    updateALane(boardId, laneWeek, propertiesToUpdate);
+                }
+                if (laneSemaine4.contains(laneWeek)) {
+                    //System.out.println("Quatrieme condition");
+                    Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.get(3), null);
+                    updateALane(boardId, laneWeek, propertiesToUpdate);
+                }
+
+                if (cards != null) {
+                    for (Card card : cards.getCards()) {
+                        if (card.getLane().getId().equals(valueOf(laneWeek))) {
+                            //System.out.println("Accept Condition");
+                            moveCard(card.getId(), String.valueOf(laneMoveTo));
+                        }
                     }
                 }
             }
@@ -511,10 +514,16 @@ public class AgilePlaceClient {
     }
 
     public void findDuplicateCardInLanes() {
-        int USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE = 1897212305;
-        int USINE_ADB_ARCHIVES_LANE = 1823767913;
-        Cards laneCards = getListOfCardsFromLane(USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE);
-        findDuplicateCardInLane(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
+        try{
+            int USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE = 1897212305;
+            int USINE_ADB_ARCHIVES_LANE = 1823767913;
+            Cards laneCards = getListOfCardsFromLane(USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE);
+            findDuplicateCardInLane(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
+        }catch (Exception e){
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans findDuplicateCardInLanes() " + e.getMessage());
+        }
+
 
     }
 

@@ -9,6 +9,8 @@ public class EnvoiSMS {
 
     static String apiSMSAccount = System.getenv("SMS_ACCOUNT_SID");
     static String apiSMSKey = System.getenv("SMS_AUTH_TOKEN");
+    static String twilioPhoneNumber = System.getenv("TWILIO_PHONE_NUMBER");
+
 
     static {
         Twilio.init(apiSMSAccount,apiSMSKey);
@@ -19,7 +21,7 @@ public class EnvoiSMS {
         PhoneNumber to = new PhoneNumber(toPhoneNumber);
 
         // Numéro Twilio (votre numéro Twilio)
-        PhoneNumber from = new PhoneNumber("16265872193");
+        PhoneNumber from = new PhoneNumber("twilioPhoneNumber");
 
         // Envoi du SMS
         Message message = Message.creator(to, from, messageBody).create();
