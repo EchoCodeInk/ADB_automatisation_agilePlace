@@ -13,7 +13,7 @@ jobs:
     - name: Configurer Java
       uses: actions/setup-java@v2
       with:
-        java-version: '11'  # Modifiez la version Java selon vos besoins
+        java-version: '21'  # Modifiez la version Java selon vos besoins
         distribution: 'adopt'
         
     - name: Installer Apache Maven
