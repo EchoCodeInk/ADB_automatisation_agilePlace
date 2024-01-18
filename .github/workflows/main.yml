@@ -18,6 +18,12 @@ jobs:
         
     - name: Installer Apache Maven
       run: sudo apt-get install -y maven
+      
+    - name: Configurer l'environnement
+      run: |
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> $GITHUB_ENV
+          echo "API_JETON_KEY=${{ secrets.API_JETON_KEY }}" >> $GITHUB_ENV
+
 
     - name: Compilation et Tests
       run: mvn clean install -B
