@@ -2,7 +2,7 @@ name: ADB_Automatisation
 
 on:
   repository_dispatch:
-    types: [deploy-new-build]
+    types: [push]
 
 jobs:
   build:
