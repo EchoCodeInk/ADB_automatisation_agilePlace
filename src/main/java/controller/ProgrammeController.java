@@ -1,8 +1,5 @@
 package controller;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 public class ProgrammeController {
     private AgilePlaceClientController agilePlaceController;
 
@@ -16,8 +13,8 @@ public class ProgrammeController {
         agilePlaceController.updateAttachmentForMagasinCheckList();
         agilePlaceController.gestionDuplicateCardInLanes();
         agilePlaceController.gestionCardSylvain();
-        agilePlaceController.updateBoardEstimationLaneCalendrierDesObjectifsUpdate();
-        agilePlaceController.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
+        agilePlaceController.setBoardEstimationLaneCalendrierDesObjectifs();
+        agilePlaceController.setBoardEstimationLaneCalendrierEnCoursDEstimation();
     }
 }
 

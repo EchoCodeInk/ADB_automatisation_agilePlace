@@ -32,14 +32,14 @@ public class AgilePlaceClientController {
         );
 
         scheduler.scheduleAtFixedRate(
-                this::updateBoardEstimationLaneCalendrierDesObjectifsUpdate,
+                this::setBoardEstimationLaneCalendrierDesObjectifs,
                 calculateInitialDelayForDailyExecution(),
                 1,
                 TimeUnit.DAYS
         );
 
         scheduler.scheduleAtFixedRate(
-                this::updateBoardEstimationLaneCalendrierEnCoursDEstimation,
+                this::setBoardEstimationLaneCalendrierEnCoursDEstimation,
                 calculateInitialDelayForDailyExecution(),
                 1,
                 TimeUnit.DAYS
@@ -61,15 +61,15 @@ public class AgilePlaceClientController {
 
     }
 
-    protected void updateBoardEstimationLaneCalendrierDesObjectifsUpdate() {
-        System.out.println("updateBoardEstimationLaneCalendrierDesObjectifsUpdate()");
+    protected void setBoardEstimationLaneCalendrierDesObjectifs() {
+        System.out.println("setBoardEstimationLaneCalendrierDesObjectifs()");
         if (LocalDate.now().getDayOfMonth() == 1) {
-            apiClient.verifieBoardEstimationLaneCalendrierDesObjectifs();
+            apiClient.setBoardEstimationLaneCalendrierDesObjectifs();
         }
     }
 
-    protected void updateBoardEstimationLaneCalendrierEnCoursDEstimation() {
-        System.out.println("updateBoardEstimationLaneCalendrierEnCoursDEstimation()");
+    protected void setBoardEstimationLaneCalendrierEnCoursDEstimation() {
+        System.out.println("setBoardEstimationLaneCalendrierEnCoursDEstimation()");
         if (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY) {
             apiClient.setBoardEstimationLaneCalendrierEnCoursDEstimation();
         }
