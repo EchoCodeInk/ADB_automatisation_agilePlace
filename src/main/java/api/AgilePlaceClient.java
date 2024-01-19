@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static api.EnvoiSMS.envoyerSMS;
 import static java.lang.String.valueOf;
 import static model.Semestre.Mois.moisAPartirDe;
 import static model.Semestre.obtenirMoisActuel;
@@ -166,7 +165,7 @@ public class AgilePlaceClient {
     }
 
     private void handleErrorResponse(Response response) {
-        System.out.println("Une exception spécifique s'est produite dans handleErrorResponse() : " + response);
+        System.out.println("Une exception spécifique s'est produite dans makeAPICall() : " + response);
     }
 
     private void handleException(Exception e) {
@@ -181,10 +180,15 @@ public class AgilePlaceClient {
 
     //Déplacer une seule carte dans une autre voie(colonne)
     private void moveCard(String cardId, String destinationLaneId) {
-        String json = "{\"cardIds\":[\"" + cardId + "\"],\"destination\":{\"laneId\":\"" + destinationLaneId + "\"}}";
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        RequestBody requestBody = RequestBody.create(json, JSON);
-        makeAPICall("/card/move", "POST", requestBody);
+        try {
+            String json = "{\"cardIds\":[\"" + cardId + "\"],\"destination\":{\"laneId\":\"" + destinationLaneId + "\"}}";
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            RequestBody requestBody = RequestBody.create(json, JSON);
+            makeAPICall("/card/move", "POST", requestBody);
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans moveCard() " + e.getMessage());
+        }
     }
 
     private Cards getListOfCardsFromLane(int laneId) {
@@ -196,12 +200,11 @@ public class AgilePlaceClient {
     //Deplacement des cartes enfant
     public void moveCardOfBoardEstimationOfTheLaneSylvain() {
         try {
-        System.out.println("moveCardOfBoardEstimationOfTheLaneSylvain()");
-        Cards cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
-        Cards cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
-        Cards verificationForDuplicatecards = getListOfCardsFromLane(2055700927);
-        List<Card> cardList = cards.getCards();
-        List<Card> cardList2 = cards2.getCards();
+            Cards cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
+            Cards cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
+            Cards verificationForDuplicatecards = getListOfCardsFromLane(2055700927);
+            List<Card> cardList = cards.getCards();
+            List<Card> cardList2 = cards2.getCards();
 
 
             if (!cardList.isEmpty()) {
@@ -214,10 +217,14 @@ public class AgilePlaceClient {
                                 for (AssignedUser assignedUser : cardToMove.getAssignedUsers()) {
                                     String fullName = assignedUser.getFullName();
                                     switch (fullName) {
-                                        case "Jessy Therrien" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_JESSY);
-                                        case "André Berthiaume" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_ANDRE);
-                                        case "Mario Vivier" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_MARIO);
-                                        case "Gaétan Dussault" -> moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_GAETAN);
+                                        case "Jessy Therrien" ->
+                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_JESSY);
+                                        case "André Berthiaume" ->
+                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_ANDRE);
+                                        case "Mario Vivier" ->
+                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_MARIO);
+                                        case "Gaétan Dussault" ->
+                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_GAETAN);
                                     }
                                 }
                             }
@@ -226,7 +233,7 @@ public class AgilePlaceClient {
                 }
             }
 
-            findDuplicateCardInLane(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
+            findDuplicateCard(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
         } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() " + e.getMessage());
@@ -244,11 +251,16 @@ public class AgilePlaceClient {
 
     //Mettre ajour une Voie(Lane)
     private void updateALane(int boardId, int laneId, Map<String, Object> propertiesToUpdate) {
-        Gson gson = new Gson();
-        String json = gson.toJson(propertiesToUpdate);
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        RequestBody requestBody = RequestBody.create(json, JSON);
-        makeAPICall("/board/" + boardId + "/lane/" + laneId, "PATCH", requestBody);
+        try {
+            Gson gson = new Gson();
+            String json = gson.toJson(propertiesToUpdate);
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            RequestBody requestBody = RequestBody.create(json, JSON);
+            makeAPICall("/board/" + boardId + "/lane/" + laneId, "PATCH", requestBody);
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans updateALane() " + e.getMessage());
+        }
     }
 
     private Map<String, Integer> createCalendrierDesObjectifs() {
@@ -311,7 +323,7 @@ public class AgilePlaceClient {
         return groupSchedule;
     }
 
-    public void updateBoardEstimationLaneCalendrierEnCoursDEstimation() {
+    public void setBoardEstimationLaneCalendrierEnCoursDEstimation() {
         try {
             List<String> dimancheSemaines = new ArrayList<>();
 
@@ -365,7 +377,7 @@ public class AgilePlaceClient {
             }
         } catch (Exception e) {
             handleException(e);
-            System.out.println("Une exception spécifique s'est produite dans updateBoardEstimationLaneCalendrierEnCoursDEstimation() " + e.getMessage());
+            System.out.println("Une exception spécifique s'est produite dans setBoardEstimationLaneCalendrierEnCoursDEstimation() " + e.getMessage());
         }
     }
 
@@ -422,8 +434,7 @@ public class AgilePlaceClient {
         return propertiesToSet;
     }
 
-    public void updateBoardEstimationLaneCalendrierDesObjectifs() {
-        System.out.println("updateBoardEstimationLaneCalendrierDesObjectifs() >>> START");
+    public void verifieBoardEstimationLaneCalendrierDesObjectifs() {
         try {
             Map<String, Integer> createCalendrierDesObjectifs = createCalendrierDesObjectifs();
             Lane laneTitleCompare = getInfoOfLane(createCalendrierDesObjectifs.get("boardId"), createCalendrierDesObjectifs.get("laneId_1"));
@@ -435,7 +446,7 @@ public class AgilePlaceClient {
             }
         } catch (Exception e) {
             handleException(e);
-            System.out.println("Une exception spécifique s'est produite dans updateLaneTitleAndDescriptionOfCalendrierDesObjectifs() " + e.getMessage());
+            System.out.println("Une exception spécifique s'est produite dans verifieBoardEstimationLaneCalendrierDesObjectifs() " + e.getMessage());
         }
     }
 
@@ -496,7 +507,6 @@ public class AgilePlaceClient {
     private void deleteAnAttachment(int cardId, int attachmentId) {
         try {
             RequestBody requestBody = RequestBody.create(null, new byte[0]);
-
             makeAPICall("/card/" + cardId + "/attachment/" + attachmentId, "DELETE", requestBody);
         } catch (Exception e) {
             handleException(e);
@@ -504,29 +514,34 @@ public class AgilePlaceClient {
         }
     }
 
-    private void findDuplicateCardInLane(List<Card> array, int laneArchive) {
-        Set<String> uniqueElements = new HashSet<>();
-        for (Card card : array) {
-            if (!uniqueElements.add(card.getCustomId().getValue())) {
-                moveCard(card.getId(), String.valueOf(laneArchive));
+    private void findDuplicateCard(List<Card> array, int laneArchive) {
+        try {
+            Set<String> uniqueElements = new HashSet<>();
+            for (Card card : array) {
+                if (!uniqueElements.add(card.getCustomId().getValue())) {
+                    moveCard(card.getId(), String.valueOf(laneArchive));
+                }
             }
+        } catch (Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans findDuplicateCard() " + e.getMessage());
         }
     }
 
     public void findDuplicateCardInLanes() {
-        try{
+        try {
             int USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE = 1897212305;
             int USINE_ADB_ARCHIVES_LANE = 1823767913;
             Cards laneCards = getListOfCardsFromLane(USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE);
-            findDuplicateCardInLane(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
-        }catch (Exception e){
+            findDuplicateCard(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
+        } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans findDuplicateCardInLanes() " + e.getMessage());
         }
 
 
     }
-    
+
     public void updateAttachmentForMagasinCheckList() {
         System.out.println("updateAttachmentForMagasinCheckList");
         //envoyerSMS("5147788120","test salut");
@@ -538,7 +553,6 @@ public class AgilePlaceClient {
             Cards suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);
             Cards crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
             List<String> costumIdJobs = new ArrayList<>();
-            System.out.println("reflectionOfBoardEstimationLainSuiviEstimationSylvain()");
             for (Card card : suiviEstimationSylvainCards.getCards()) {
                 costumIdJobs.add(card.getCustomId().getValue());
             }

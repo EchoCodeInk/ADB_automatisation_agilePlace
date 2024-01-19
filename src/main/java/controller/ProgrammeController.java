@@ -19,8 +19,6 @@ public class ProgrammeController {
         agilePlaceController.updateBoardEstimationLaneCalendrierDesObjectifsUpdate();
         agilePlaceController.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
     }
-
-
 }
 
 

@@ -64,18 +64,19 @@ public class AgilePlaceClientController {
     protected void updateBoardEstimationLaneCalendrierDesObjectifsUpdate() {
         System.out.println("updateBoardEstimationLaneCalendrierDesObjectifsUpdate()");
         if (LocalDate.now().getDayOfMonth() == 1) {
-            apiClient.updateBoardEstimationLaneCalendrierDesObjectifs();
+            apiClient.verifieBoardEstimationLaneCalendrierDesObjectifs();
         }
     }
 
     protected void updateBoardEstimationLaneCalendrierEnCoursDEstimation() {
         System.out.println("updateBoardEstimationLaneCalendrierEnCoursDEstimation()");
         if (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY) {
-            apiClient.updateBoardEstimationLaneCalendrierEnCoursDEstimation();
+            apiClient.setBoardEstimationLaneCalendrierEnCoursDEstimation();
         }
     }
 
     protected void updateAttachmentForMagasinCheckList() {
+        System.out.println("updateAttachmentForMagasinCheckList()");
         apiClient.updateAttachmentForMagasinCheckList();
     }
     protected void gestionDuplicateCardInLanes() {
