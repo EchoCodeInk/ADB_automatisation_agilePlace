@@ -434,7 +434,7 @@ public class AgilePlaceClient {
         return propertiesToSet;
     }
 
-    public void verifieBoardEstimationLaneCalendrierDesObjectifs() {
+    public void setBoardEstimationLaneCalendrierDesObjectifs() {
         try {
             Map<String, Integer> createCalendrierDesObjectifs = createCalendrierDesObjectifs();
             Lane laneTitleCompare = getInfoOfLane(createCalendrierDesObjectifs.get("boardId"), createCalendrierDesObjectifs.get("laneId_1"));
