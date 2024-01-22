@@ -11,11 +11,7 @@ jobs:
 
     steps:
       - name: Checkout du code
-        #uses: actions/checkout@v2
-        run: |
-          git clone https://github.com/${{ github.repository }} $GITHUB_WORKSPACE
-          Get-ChildItem $GITHUB_WORKSPACE | Unblock-File
-
+        uses: actions/checkout@v2
 
       - name: Configurer Java
         uses: actions/setup-java@v2
