@@ -160,4 +160,4 @@ buildNumber.properties
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,maven
-src/main/ressources/application.properties
+src/main/resources/application.properties
