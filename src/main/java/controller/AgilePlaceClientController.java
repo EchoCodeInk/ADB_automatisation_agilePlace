@@ -25,7 +25,7 @@ public class AgilePlaceClientController {
         scheduler.scheduleAtFixedRate(
                 this::gestionDuplicateCardInLanes,
                 0,
-                1,
+                2,
                 TimeUnit.MINUTES
         );
 

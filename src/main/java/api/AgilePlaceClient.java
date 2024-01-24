@@ -210,8 +210,15 @@ public class AgilePlaceClient {
             Cards cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
             Cards cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
             Cards verificationForDuplicatecards = getListOfCardsFromLane(2055700927);
-            List<Card> cardList = cards.getCards();
-            List<Card> cardList2 = cards2.getCards();
+            List<Card> cardList = new ArrayList<>();
+            List<Card> cardList2 = new ArrayList<>();
+            if (cards != null) {
+                cardList = cards.getCards();
+            }
+
+            if (cards2 != null) {
+                cardList2 = cards2.getCards();
+            }
 
 
             if (!cardList.isEmpty()) {
@@ -551,7 +558,9 @@ public class AgilePlaceClient {
             int USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE = 1897212305;
             int USINE_ADB_ARCHIVES_LANE = 1823767913;
             Cards laneCards = getListOfCardsFromLane(USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE);
-            findDuplicateCard(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
+            if (laneCards != null) {
+                findDuplicateCard(laneCards.getCards(), USINE_ADB_ARCHIVES_LANE);
+            }
         } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans findDuplicateCardInLanes() " + e.getMessage());
@@ -586,10 +595,10 @@ public class AgilePlaceClient {
 
 
     public void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
-        try{
+        try {
             List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898);
             Lane laneVerify = getInfoOfLane(BOARD_ESTIMATION, 2063557856);
-            int wipLimitlaneVerify =Integer.parseInt(laneVerify.getWipLimit()) ;
+            int wipLimitlaneVerify = Integer.parseInt(laneVerify.getWipLimit());
 
             if (newWipLimit != wipLimitlaneVerify)
                 for (Integer laneid : laneSemaineEnCours) {
@@ -611,7 +620,7 @@ public class AgilePlaceClient {
                     propertiesToSet.put("wipLimit", newWipLimit);
                     updateALane(BOARD_ESTIMATION, laneid, propertiesToSet);
                 }
-        }catch (Exception e){
+        } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans setAdnUpdateWipLimiteOfEnCourDEstimationLane() " + e.getMessage());
         }
