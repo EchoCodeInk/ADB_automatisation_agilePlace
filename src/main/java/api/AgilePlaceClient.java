@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +50,7 @@ public class AgilePlaceClient {
     private int CALENDRIER_TO_ARCHIVE_GAGNEES = 2058436638;
 
     //Attribut pour le calendrier "EN COURS D'ESTIMATION" du board "ESTIMATION"
+    private int newWipLimit;
     private int CAL_ANDRE_MAIN_LANE = 2043380283;
     private int CAL_JESSY_MAIN_LANE = 2043624709;
     private int CAL_MARIO_MAIN_LANE = 2043624714;
@@ -69,6 +71,11 @@ public class AgilePlaceClient {
     private final int CAL_JESSY_SEM_4 = 2075643760;
     private final int CAL_MARIO_SEM_4 = 2075643761;
     private final int CAL_GAETAN_SEM_4 = 2075551143;
+    private final int CAL_SYLVAIN_MAIN_LANE = 2078606448;
+    private final int CAL_SYLVAIN_SEM_1 = 2078662898;
+    private final int CAL_SYLVAIN_SEM_2 = 2078662899;
+    private final int CAL_SYLVAIN_SEM_3 = 2078730789;
+    private final int CAL_SYLVAIN_SEM_4 = 2078730790;
 
     public AgilePlaceClient() {
         this.apiConnector = new AgilePlaceConnector();
@@ -320,6 +327,17 @@ public class AgilePlaceClient {
         gaetanSchedule.put("lane_week_4", CAL_GAETAN_SEM_4);
 
         groupSchedule.add(gaetanSchedule);
+
+        Map<String, Integer> sylvainSchedule = new HashMap<>();
+        gaetanSchedule.put("boardId", BOARD_ESTIMATION);
+        gaetanSchedule.put("main_lane", CAL_SYLVAIN_MAIN_LANE);
+        gaetanSchedule.put("lane_week_1", CAL_SYLVAIN_SEM_1);
+        gaetanSchedule.put("lane_week_2", CAL_SYLVAIN_SEM_2);
+        gaetanSchedule.put("lane_week_3", CAL_SYLVAIN_SEM_3);
+        gaetanSchedule.put("lane_week_4", CAL_SYLVAIN_SEM_4);
+
+
+        groupSchedule.add(sylvainSchedule);
         return groupSchedule;
     }
 
@@ -385,10 +403,10 @@ public class AgilePlaceClient {
         try {
             Cards cards = getListOfCardsFromLane(initialLane);
             if (cards != null) {
-                List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1);
-                List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2);
-                List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3);
-                List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4);
+                List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1, CAL_SYLVAIN_SEM_1);
+                List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2, CAL_SYLVAIN_SEM_2);
+                List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3, CAL_SYLVAIN_SEM_3);
+                List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4, CAL_SYLVAIN_SEM_4);
 
                 if (laneSemaine1.contains(laneMoveTo)) {
                     //System.out.println("Premiere condition");
@@ -543,7 +561,6 @@ public class AgilePlaceClient {
     }
 
     public void updateAttachmentForMagasinCheckList() {
-        System.out.println("updateAttachmentForMagasinCheckList");
         //envoyerSMS("5147788120","test salut");
     }
 
@@ -565,6 +582,41 @@ public class AgilePlaceClient {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans reflectionOfBoardEstimationLainSuiviEstimationSylvain() " + e.getMessage());
         }
+    }
+
+
+    public void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
+        try{
+            List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898);
+            Lane laneVerify = getInfoOfLane(BOARD_ESTIMATION, 2063557856);
+            int wipLimitlaneVerify =Integer.parseInt(laneVerify.getWipLimit()) ;
+
+            if (newWipLimit != wipLimitlaneVerify)
+                for (Integer laneid : laneSemaineEnCours) {
+                    if (LocalDate.now().getDayOfWeek() == DayOfWeek.MONDAY) {
+                        newWipLimit = 600000;
+                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.TUESDAY) {
+                        newWipLimit = 480000;
+                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.WEDNESDAY) {
+                        newWipLimit = 360000;
+                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.TUESDAY) {
+                        newWipLimit = 240000;
+                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.FRIDAY) {
+                        newWipLimit = 120000;
+                    } else {
+                        newWipLimit = 600000;
+                    }
+                    //Integer WipLimite = Integer.valueOf(getWipLimiteOfLane(BOARD_ESTIMATION,laneId)) ;
+                    Map<String, Object> propertiesToSet = new HashMap<>();
+                    propertiesToSet.put("wipLimit", newWipLimit);
+                    updateALane(BOARD_ESTIMATION, laneid, propertiesToSet);
+                }
+        }catch (Exception e){
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans setAdnUpdateWipLimiteOfEnCourDEstimationLane() " + e.getMessage());
+        }
+
+
     }
 
     private CardEvent getActivityFromCard(String cardId) {

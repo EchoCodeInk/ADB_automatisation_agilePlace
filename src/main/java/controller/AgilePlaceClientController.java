@@ -10,12 +10,10 @@ import java.util.concurrent.TimeUnit;
 public class AgilePlaceClientController {
     private AgilePlaceClient apiClient;
     private ScheduledExecutorService scheduler;
-    private ScheduledExecutorService scheduler2;
 
     AgilePlaceClientController() {
         this.apiClient = new AgilePlaceClient();
         this.scheduler = Executors.newScheduledThreadPool(1);
-        this.scheduler2 = Executors.newScheduledThreadPool(1);
 
         scheduler.scheduleAtFixedRate(
                 this::gestionCardSylvain,
@@ -33,14 +31,20 @@ public class AgilePlaceClientController {
 
         scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierDesObjectifs,
-                calculateInitialDelayForDailyExecution(),
+                0,
                 1,
                 TimeUnit.DAYS
         );
 
         scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierEnCoursDEstimation,
-                calculateInitialDelayForDailyExecution(),
+                0,
+                1,
+                TimeUnit.DAYS
+        );
+        scheduler.scheduleAtFixedRate(
+                this::setAndUpdateWipLimiteOfEnCourDEstimationLane,
+                0,
                 1,
                 TimeUnit.DAYS
         );
@@ -56,31 +60,74 @@ public class AgilePlaceClientController {
 
     protected void gestionCardSylvain() {
         System.out.println("gestionCardSylvain()");
-        apiClient.moveCardOfBoardEstimationOfTheLaneSylvain();
-        apiClient.reflectionOfBoardEstimationLainSuiviEstimationSylvain();
-
+        try {
+            apiClient.moveCardOfBoardEstimationOfTheLaneSylvain();
+            apiClient.reflectionOfBoardEstimationLainSuiviEstimationSylvain();
+            System.out.println("gestionCardSylvain() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in gestionCardSylvain(): " + e.getMessage());
+        }
     }
 
     protected void setBoardEstimationLaneCalendrierDesObjectifs() {
         System.out.println("setBoardEstimationLaneCalendrierDesObjectifs()");
-        if (LocalDate.now().getDayOfMonth() == 1) {
-            apiClient.setBoardEstimationLaneCalendrierDesObjectifs();
+        try {
+            if (LocalDate.now().getDayOfMonth() == 1) {
+                apiClient.setBoardEstimationLaneCalendrierDesObjectifs();
+            }
+            System.out.println("setBoardEstimationLaneCalendrierDesObjectifs() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in setBoardEstimationLaneCalendrierDesObjectifs(): " + e.getMessage());
         }
     }
 
     protected void setBoardEstimationLaneCalendrierEnCoursDEstimation() {
         System.out.println("setBoardEstimationLaneCalendrierEnCoursDEstimation()");
-        if (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY) {
-            apiClient.setBoardEstimationLaneCalendrierEnCoursDEstimation();
+        try {
+            if (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY) {
+                apiClient.setBoardEstimationLaneCalendrierEnCoursDEstimation();
+            }
+            System.out.println("setBoardEstimationLaneCalendrierEnCoursDEstimation() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in setBoardEstimationLaneCalendrierEnCoursDEstimation(): " + e.getMessage());
         }
     }
 
     protected void updateAttachmentForMagasinCheckList() {
         System.out.println("updateAttachmentForMagasinCheckList()");
-        apiClient.updateAttachmentForMagasinCheckList();
+        try {
+            apiClient.updateAttachmentForMagasinCheckList();
+            System.out.println("updateAttachmentForMagasinCheckList() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in updateAttachmentForMagasinCheckList(): " + e.getMessage());
+        }
     }
     protected void gestionDuplicateCardInLanes() {
         System.out.println("gestionDuplicateCardInLanes()");
-        apiClient.findDuplicateCardInLanes();
+        try {
+            apiClient.findDuplicateCardInLanes();
+            System.out.println("gestionDuplicateCardInLanes() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in gestionDuplicateCardInLanes(): " + e.getMessage());
+        }
     }
+    protected void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
+        System.out.println("setAndUpdateWipLimiteOfEnCourDEstimationLane()");
+        try {
+            apiClient.setAndUpdateWipLimiteOfEnCourDEstimationLane();
+            System.out.println("setAndUpdateWipLimiteOfEnCourDEstimationLane() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in setAndUpdateWipLimiteOfEnCourDEstimationLane(): " + e.getMessage());
+        }
+
+
+    }
+
+
 }
