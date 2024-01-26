@@ -50,7 +50,7 @@ public class AgilePlaceClient {
     private int CALENDRIER_TO_ARCHIVE_GAGNEES = 2058436638;
 
     //Attribut pour le calendrier "EN COURS D'ESTIMATION" du board "ESTIMATION"
-    private int newWipLimit;
+    private DayOfWeek dayOfWipLimite;
     private int CAL_ANDRE_MAIN_LANE = 2043380283;
     private int CAL_JESSY_MAIN_LANE = 2043624709;
     private int CAL_MARIO_MAIN_LANE = 2043624714;
@@ -246,8 +246,9 @@ public class AgilePlaceClient {
                     }
                 }
             }
-
-            findDuplicateCard(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
+            if (verificationForDuplicatecards != null) {
+                findDuplicateCard(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
+            }
         } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() " + e.getMessage());
@@ -575,16 +576,19 @@ public class AgilePlaceClient {
 
     public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
         try {
-
             Cards suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);
             Cards crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
             List<String> costumIdJobs = new ArrayList<>();
-            for (Card card : suiviEstimationSylvainCards.getCards()) {
-                costumIdJobs.add(card.getCustomId().getValue());
+            if (suiviEstimationSylvainCards != null) {
+                for (Card card : suiviEstimationSylvainCards.getCards()) {
+                    costumIdJobs.add(card.getCustomId().getValue());
+                }
             }
-            for (Card card : crmSuiviSylvainCards.getCards()) {
-                if (!costumIdJobs.contains(card.getCustomId().getValue())) {
-                    moveCard(card.getId(), "1907499860");
+            if (crmSuiviSylvainCards != null) {
+                for (Card card : crmSuiviSylvainCards.getCards()) {
+                    if (!costumIdJobs.contains(card.getCustomId().getValue())) {
+                        moveCard(card.getId(), "1907499860");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -597,29 +601,28 @@ public class AgilePlaceClient {
     public void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
         try {
             List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898);
-            Lane laneVerify = getInfoOfLane(BOARD_ESTIMATION, 2063557856);
-            int wipLimitlaneVerify = Integer.parseInt(laneVerify.getWipLimit());
-
-            if (newWipLimit != wipLimitlaneVerify)
-                for (Integer laneid : laneSemaineEnCours) {
-                    if (LocalDate.now().getDayOfWeek() == DayOfWeek.MONDAY) {
-                        newWipLimit = 600000;
-                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.TUESDAY) {
-                        newWipLimit = 480000;
-                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.WEDNESDAY) {
-                        newWipLimit = 360000;
-                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.TUESDAY) {
-                        newWipLimit = 240000;
-                    } else if (LocalDate.now().getDayOfWeek() == DayOfWeek.FRIDAY) {
-                        newWipLimit = 120000;
-                    } else {
-                        newWipLimit = 600000;
-                    }
-                    //Integer WipLimite = Integer.valueOf(getWipLimiteOfLane(BOARD_ESTIMATION,laneId)) ;
-                    Map<String, Object> propertiesToSet = new HashMap<>();
-                    propertiesToSet.put("wipLimit", newWipLimit);
-                    updateALane(BOARD_ESTIMATION, laneid, propertiesToSet);
+            int newWipLimit = 0;
+            if (LocalDate.now().getDayOfWeek() != dayOfWipLimite)
+                dayOfWipLimite = LocalDate.now().getDayOfWeek();
+            for (Integer laneid : laneSemaineEnCours) {
+                if (dayOfWipLimite == DayOfWeek.MONDAY) {
+                    newWipLimit = 600000;
+                } else if (dayOfWipLimite == DayOfWeek.TUESDAY) {
+                    newWipLimit = 480000;
+                } else if (dayOfWipLimite == DayOfWeek.WEDNESDAY) {
+                    newWipLimit = 360000;
+                } else if (dayOfWipLimite == DayOfWeek.THURSDAY) {
+                    newWipLimit = 240000;
+                } else if (dayOfWipLimite == DayOfWeek.FRIDAY) {
+                    newWipLimit = 120000;
+                } else {
+                    newWipLimit = 600000;
                 }
+                //Integer WipLimite = Integer.valueOf(getWipLimiteOfLane(BOARD_ESTIMATION,laneId)) ;
+                Map<String, Object> propertiesToSet = new HashMap<>();
+                propertiesToSet.put("wipLimit", newWipLimit);
+                updateALane(BOARD_ESTIMATION, laneid, propertiesToSet);
+            }
         } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans setAdnUpdateWipLimiteOfEnCourDEstimationLane() " + e.getMessage());
