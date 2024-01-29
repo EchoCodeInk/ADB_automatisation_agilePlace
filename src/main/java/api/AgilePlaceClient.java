@@ -65,7 +65,7 @@ public class AgilePlaceClient {
     private final int CAL_GAETAN_SEM_2 = 2074240316;
     private final int CAL_ANDRE_SEM_3 = 2074260484;
     private final int CAL_JESSY_SEM_3 = 2074260485;
-    private final int CAL_MARIO_SEM_3 = 2074260487;
+    private final int CAL_MARIO_SEM_3 = 2074260486;
     private final int CAL_GAETAN_SEM_3 = 2074260487;
     private final int CAL_ANDRE_SEM_4 = 2075643759;
     private final int CAL_JESSY_SEM_4 = 2075643760;
@@ -337,12 +337,12 @@ public class AgilePlaceClient {
         groupSchedule.add(gaetanSchedule);
 
         Map<String, Integer> sylvainSchedule = new HashMap<>();
-        gaetanSchedule.put("boardId", BOARD_ESTIMATION);
-        gaetanSchedule.put("main_lane", CAL_SYLVAIN_MAIN_LANE);
-        gaetanSchedule.put("lane_week_1", CAL_SYLVAIN_SEM_1);
-        gaetanSchedule.put("lane_week_2", CAL_SYLVAIN_SEM_2);
-        gaetanSchedule.put("lane_week_3", CAL_SYLVAIN_SEM_3);
-        gaetanSchedule.put("lane_week_4", CAL_SYLVAIN_SEM_4);
+        sylvainSchedule.put("boardId", BOARD_ESTIMATION);
+        sylvainSchedule.put("main_lane", CAL_SYLVAIN_MAIN_LANE);
+        sylvainSchedule.put("lane_week_1", CAL_SYLVAIN_SEM_1);
+        sylvainSchedule.put("lane_week_2", CAL_SYLVAIN_SEM_2);
+        sylvainSchedule.put("lane_week_3", CAL_SYLVAIN_SEM_3);
+        sylvainSchedule.put("lane_week_4", CAL_SYLVAIN_SEM_4);
 
 
         groupSchedule.add(sylvainSchedule);
