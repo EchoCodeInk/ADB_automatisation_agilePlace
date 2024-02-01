@@ -32,21 +32,21 @@ public class AgilePlaceClientController {
         scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierDesObjectifs,
                 0,
-                1,
-                TimeUnit.DAYS
+                12,
+                TimeUnit.HOURS
         );
 
         scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierEnCoursDEstimation,
                 0,
-                1,
-                TimeUnit.DAYS
+                12,
+                TimeUnit.HOURS
         );
         scheduler.scheduleAtFixedRate(
                 this::setAndUpdateWipLimiteOfEnCourDEstimationLane,
                 0,
-                1,
-                TimeUnit.DAYS
+                12,
+                TimeUnit.HOURS
         );
     }
     private long calculateInitialDelayForDailyExecution() {
@@ -73,6 +73,7 @@ public class AgilePlaceClientController {
     protected void setBoardEstimationLaneCalendrierDesObjectifs() {
         System.out.println("setBoardEstimationLaneCalendrierDesObjectifs()");
         try {
+
             if (LocalDate.now().getDayOfMonth() == 1) {
                 apiClient.setBoardEstimationLaneCalendrierDesObjectifs();
             }
