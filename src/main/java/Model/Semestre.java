@@ -19,13 +19,13 @@ public class Semestre {
 
             List<Mois> moisAPartirDe = new ArrayList<>(moisList.subList(index, moisList.size()));
 
-            // Si le tableau n'a pas 6 éléments, ajoutez les mois manquants en recommençant du début
-            while (moisAPartirDe.size() < 6) {
+            // Si le tableau n'a pas 12 éléments, ajoutez les mois manquants en recommençant du début
+            while (moisAPartirDe.size() < 12) {
                 moisAPartirDe.addAll(Arrays.asList(values()));
             }
 
             // Retournez les 6 prochains mois à partir du mois actuel
-            return moisAPartirDe.subList(0, 6);
+            return moisAPartirDe.subList(0, 12);
         }
     }
     public static Mois obtenirMoisActuel() {

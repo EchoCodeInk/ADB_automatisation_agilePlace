@@ -47,6 +47,12 @@ public class AgilePlaceClient {
     private int CALENDRIER_LANE_MONTH_4 = 2072271540;
     private int CALENDRIER_LANE_MONTH_5 = 2072271541;
     private int CALENDRIER_LANE_MONTH_6 = 2072271542;
+    private int CALENDRIER_LANE_MONTH_7 = 2082405928;
+    private int CALENDRIER_LANE_MONTH_8 = 2086144465;
+    private int CALENDRIER_LANE_MONTH_9 = 2086144466;
+    private int CALENDRIER_LANE_MONTH_10 = 2086144467;
+    private int CALENDRIER_LANE_MONTH_11 = 2086144468;
+    private int CALENDRIER_LANE_MONTH_12 = 2086162524;
     private int CALENDRIER_TO_ARCHIVE_GAGNEES = 2058436638;
 
     //Attribut pour le calendrier "EN COURS D'ESTIMATION" du board "ESTIMATION"
@@ -290,6 +296,12 @@ public class AgilePlaceClient {
         createCalendrierDesObjectifs.put("laneId_4", CALENDRIER_LANE_MONTH_4);
         createCalendrierDesObjectifs.put("laneId_5", CALENDRIER_LANE_MONTH_5);
         createCalendrierDesObjectifs.put("laneId_6", CALENDRIER_LANE_MONTH_6);
+        createCalendrierDesObjectifs.put("laneId_7", CALENDRIER_LANE_MONTH_7);
+        createCalendrierDesObjectifs.put("laneId_8", CALENDRIER_LANE_MONTH_8);
+        createCalendrierDesObjectifs.put("laneId_9", CALENDRIER_LANE_MONTH_9);
+        createCalendrierDesObjectifs.put("laneId_10", CALENDRIER_LANE_MONTH_10);
+        createCalendrierDesObjectifs.put("laneId_11", CALENDRIER_LANE_MONTH_11);
+        createCalendrierDesObjectifs.put("laneId_12", CALENDRIER_LANE_MONTH_12);
         return createCalendrierDesObjectifs;
     }
 
@@ -481,17 +493,17 @@ public class AgilePlaceClient {
         try {
             List<Semestre.Mois> listMonth = moisAPartirDe(obtenirMoisActuel());
             Cards cards = getListOfCardsFromLane(createCalendrier.get("main_lane"));
-            for (int i = 0; i < createCalendrier.size() - 1; i++) {
+            for (int i = 0; i < listMonth.size() ; i++) {
                 Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(String.valueOf(listMonth.get(i)), null);
                 updateALane(createCalendrier.get("boardId"), createCalendrier.get("laneId_" + (i + 1)), propertiesToUpdate);
                 for (Card card : cards.getCards()) {
-                    int moveTo = (i + 5) % 6;
-                    if (moveTo == 5) {
+                    int moveTo = (i + 11) % 12;
+                    if (moveTo == 11) {
                         if (card.getLane().getId().equals(valueOf(createCalendrier.get("laneId_" + (i + 1))))) {
                             moveCard(card.getId(), valueOf(createCalendrier.get("archive_lane")));
                         }
                     }
-                    if (moveTo != 5) {
+                    if (moveTo != 11) {
                         if (card.getLane().getId().equals(valueOf(createCalendrier.get("laneId_" + (i + 1))))) {
                             moveCard(card.getId(), valueOf(createCalendrier.get("laneId_" + (moveTo + 1))));
                         }
