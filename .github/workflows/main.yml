@@ -1,51 +1,51 @@
-name: adb-automatisation
+# name: adb-automatisation
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  build:
-    runs-on: self-hosted
+# jobs:
+#   build:
+#     runs-on: self-hosted
 
-    steps:
-      - name: Checkout du code
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout du code
+#         uses: actions/checkout@v2
 
-      - name: Configurer Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: '21'
-          distribution: 'adopt'
+#       - name: Configurer Java
+#         uses: actions/setup-java@v2
+#         with:
+#           java-version: '21'
+#           distribution: 'adopt'
 
-      - name: Installer Apache Maven
-        run: sudo apt-get install -y maven
+#       - name: Installer Apache Maven
+#         run: sudo apt-get install -y maven
 
-      - name: Configurer l'environnement
-        run: |
-          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> $GITHUB_ENV
-          echo "API_JETON_KEY=${{ secrets.API_JETON_KEY }}" >> $GITHUB_ENV
-          echo "SMS_ACCOUNT_SID=${{ secrets.SMS_ACCOUNT_SID }}" >> $GITHUB_ENV
-          echo "SMS_AUTH_TOKEN=${{ secrets.SMS_AUTH_TOKEN }}" >> $GITHUB_ENV
+#       - name: Configurer l'environnement
+#         run: |
+#           echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" >> $GITHUB_ENV
+#           echo "API_JETON_KEY=${{ secrets.API_JETON_KEY }}" >> $GITHUB_ENV
+#           echo "SMS_ACCOUNT_SID=${{ secrets.SMS_ACCOUNT_SID }}" >> $GITHUB_ENV
+#           echo "SMS_AUTH_TOKEN=${{ secrets.SMS_AUTH_TOKEN }}" >> $GITHUB_ENV
 
-          # Vérifier si les secrets sont correctement configurés
-          if [ -z "${{ secrets.API_BASE_URL }}" ] || [ -z "${{ secrets.API_JETON_KEY }}" ] || [ -z "${{ secrets.SMS_ACCOUNT_SID }}" ] || [ -z "${{ secrets.SMS_AUTH_TOKEN }}" ]; then
-            echo "Erreur : Les secrets ne sont pas correctement configurés."
-            exit 1
-          fi
+#           # Vérifier si les secrets sont correctement configurés
+#           if [ -z "${{ secrets.API_BASE_URL }}" ] || [ -z "${{ secrets.API_JETON_KEY }}" ] || [ -z "${{ secrets.SMS_ACCOUNT_SID }}" ] || [ -z "${{ secrets.SMS_AUTH_TOKEN }}" ]; then
+#             echo "Erreur : Les secrets ne sont pas correctement configurés."
+#             exit 1
+#           fi
 
-      - name: Compilation et Tests
-        run: mvn clean install -B
+#       - name: Compilation et Tests
+#         run: mvn clean install -B
 
-      - name: Exécution du programme avec Maven
-        run: mvn exec:java -Dexec.mainClass="Main"
+#       - name: Exécution du programme avec Maven
+#         run: mvn exec:java -Dexec.mainClass="Main"
 
-      - name: Notify AgilePlace
-        run: |
-          # Ajoutez ici les commandes pour notifier AgilePlace avec les informations de client_payload
-          echo "Description: ${{ github.event.client_payload.automation.description }}"
-          echo "Branch Name: ${{ github.event.client_payload.card.customFieldsByLabel.branch-name }}"
-          echo "Project Name: ${{ github.event.client_payload.card.customFieldsByLabel.project-name }}"
+#       - name: Notify AgilePlace
+#         run: |
+#           # Ajoutez ici les commandes pour notifier AgilePlace avec les informations de client_payload
+#           echo "Description: ${{ github.event.client_payload.automation.description }}"
+#           echo "Branch Name: ${{ github.event.client_payload.card.customFieldsByLabel.branch-name }}"
+#           echo "Project Name: ${{ github.event.client_payload.card.customFieldsByLabel.project-name }}"
           
-          # Ajoutez vos commandes pour interagir avec AgilePlace en fonction de vos besoins
+#           # Ajoutez vos commandes pour interagir avec AgilePlace en fonction de vos besoins
