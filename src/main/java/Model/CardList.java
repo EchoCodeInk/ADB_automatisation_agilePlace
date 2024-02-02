@@ -2,10 +2,10 @@ package model;
 
 import java.util.List;
 
-public class Cards {
+public class CardList {
     private List<Card> cards;
 
-    public Cards(List<Card> cards) {
+    public CardList(List<Card> cards) {
         this.cards = cards;
     }
 

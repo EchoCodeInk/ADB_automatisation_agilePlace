@@ -9,15 +9,6 @@ public class AssignedUser {
     private boolean hasAccess;
     private String avatar;
 
-    public AssignedUser(String id, String emailAddress, String fullName, String firstName, String lastName, boolean hasAccess, String avatar) {
-        this.id = id;
-        this.emailAddress = emailAddress;
-        this.fullName = fullName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.hasAccess = hasAccess;
-        this.avatar = avatar;
-    }
     public String getId() {
         return id;
     }

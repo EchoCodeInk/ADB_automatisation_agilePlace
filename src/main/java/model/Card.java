@@ -6,7 +6,7 @@ import java.util.List;
 public class Card {
 
     private String id;
-    private Board board;
+    private BoardDetails board;
     private String title;
     private  String version;
     private Type type;
@@ -35,7 +35,7 @@ public class Card {
 
 
     // Constructeur minimal
-    public Card(Board board , String title) {
+    public Card(BoardDetails board , String title) {
         this.board = board;
         this.title = title;
 
@@ -46,11 +46,11 @@ public class Card {
         return id;
     }
 
-    public Board getBoard() {
+    public BoardDetails getBoard() {
         return board;
     }
 
-    public void setBoard(Board board) {
+    public void setBoard(BoardDetails board) {
         this.board = board;
     }
 
