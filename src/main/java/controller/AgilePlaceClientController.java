@@ -3,6 +3,8 @@ package controller;
 import api.AgilePlaceClient;
 
 import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,13 +50,20 @@ public class AgilePlaceClientController {
                 12,
                 TimeUnit.HOURS
         );
+        scheduler.scheduleAtFixedRate(
+                this:: updateACardType,
+                0,
+                12,
+                TimeUnit.HOURS
+        );
+
     }
+
     private long calculateInitialDelayForDailyExecution() {
         LocalDate now = LocalDate.now();
         LocalDate tomorrow = now.plusDays(1);
         LocalDateTime midnight = LocalDateTime.of(tomorrow, LocalTime.MIDNIGHT);
-        long initialDelay = Duration.between(LocalDateTime.now(), midnight).toMillis();
-        return initialDelay;
+        return Duration.between(LocalDateTime.now(), midnight).toMillis();
     }
 
 
@@ -107,6 +116,7 @@ public class AgilePlaceClientController {
             System.err.println("Error in updateAttachmentForMagasinCheckList(): " + e.getMessage());
         }
     }
+
     protected void gestionDuplicateCardInLanes() {
         System.out.println("gestionDuplicateCardInLanes()");
         try {
@@ -117,6 +127,7 @@ public class AgilePlaceClientController {
             System.err.println("Error in gestionDuplicateCardInLanes(): " + e.getMessage());
         }
     }
+
     protected void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
         System.out.println("setAndUpdateWipLimiteOfEnCourDEstimationLane()");
         try {
@@ -126,9 +137,20 @@ public class AgilePlaceClientController {
             e.printStackTrace();
             System.err.println("Error in setAndUpdateWipLimiteOfEnCourDEstimationLane(): " + e.getMessage());
         }
-
-
     }
 
-
+    protected void updateACardType() {
+        System.out.println("updateACardType()");
+        int
+        try {
+            List<Integer> boardList = List.of(2076380043, 1823652151, 1954823342);
+            for (int boardId : boardList) {
+                apiClient.updateACardType(boardId);
+            }
+            System.out.println("updateACardType() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in updateACardType(): " + e.getMessage());
+        }
+    }
 }

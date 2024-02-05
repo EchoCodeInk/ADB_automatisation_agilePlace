@@ -16,7 +16,7 @@ public class ProgrammeController {
     public void startProgramme() {
         System.out.println("START PROGRAMME ");
         //agilePlaceClient.getListOfCardTypes(1823652151);
-        agilePlaceClient.updateACardType(2057018447);
+        agilePlaceController.updateACardType();
         agilePlaceController.setAndUpdateWipLimiteOfEnCourDEstimationLane();
         agilePlaceController.updateAttachmentForMagasinCheckList();
         agilePlaceController.gestionDuplicateCardInLanes();

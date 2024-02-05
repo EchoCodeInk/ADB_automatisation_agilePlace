@@ -125,6 +125,7 @@ public class AgilePlaceClient {
 
             Request request = requestBuilder.build();
 
+
             try {
                 Response response = client.newCall(request).execute();
                 int statusCode = response.code();
@@ -151,6 +152,12 @@ public class AgilePlaceClient {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans makeAPICall() catch 2 : " + e);
             return null;
+        } finally {
+            if (client != null) {
+                // Fermer le client OkHttpClient après utilisation
+                client.dispatcher().executorService().shutdown();
+                client.connectionPool().evictAll();
+            }
         }
     }
 
