@@ -16,8 +16,8 @@ public class EnvoiSMS {
 
     static {
         // Récupérer les valeurs depuis les variables d'environnement
-        apiSMSAccount = System.getenv("SMS_ACCOUNT_SID");
-        apiSMSKey = System.getenv("SMS_AUTH_TOKEN");
+        apiSMSAccount = System.getenv("TWILIO_SMS_ACCOUNT_SID");
+        apiSMSKey = System.getenv("TWILIO_SMS_AUTH_TOKEN");
         twilioPhoneNumber = System.getenv("TWILIO_PHONE_NUMBER");
 
         // Si certaines variables d'environnement ne sont pas définies, charger depuis le fichier application.properties
@@ -41,10 +41,10 @@ public class EnvoiSMS {
 
             // Ne surcharge le chargement depuis le fichier que si les variables d'environnement ne sont pas définies
             if (apiSMSAccount == null) {
-                apiSMSAccount = prop.getProperty("SMS_ACCOUNT_SID");
+                apiSMSAccount = prop.getProperty("TWILIO_SMS_ACCOUNT_SID");
             }
             if (apiSMSKey == null) {
-                apiSMSKey = prop.getProperty("SMS_AUTH_TOKEN");
+                apiSMSKey = prop.getProperty("TWILIO_SMS_AUTH_TOKEN");
             }
             if (twilioPhoneNumber == null) {
                 twilioPhoneNumber = prop.getProperty("TWILIO_PHONE_NUMBER");

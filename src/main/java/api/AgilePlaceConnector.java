@@ -10,8 +10,8 @@ public class AgilePlaceConnector {
 
     public AgilePlaceConnector() {
         // Récupérer les valeurs depuis les variables d'environnement
-        apiUrl = System.getenv("API_BASE_URL");
-        apiKey = System.getenv("API_JETON_KEY");
+        apiUrl = System.getenv("AGILEPLACE_API_BASE_URL");
+        apiKey = System.getenv("AGILEPLACE_API_JETON_KEY");
 
         // Si certaines variables d'environnement ne sont pas définies, charger depuis le fichier application.properties
         if (apiUrl == null || apiKey == null) {
@@ -31,10 +31,10 @@ public class AgilePlaceConnector {
 
             // Ne surcharge le chargement depuis le fichier que si les variables d'environnement ne sont pas définies
             if (apiUrl == null) {
-                apiUrl = prop.getProperty("API_BASE_URL");
+                apiUrl = prop.getProperty("AGILEPLACE_API_BASE_URL");
             }
             if (apiKey == null) {
-                apiKey = prop.getProperty("API_JETON_KEY");
+                apiKey = prop.getProperty("AGILEPLACE_API_JETON_KEY");
             }
         } catch (IOException e) {
             System.out.println("Une exception spécifique s'est produite dans loadProperties() : " + e.getMessage());

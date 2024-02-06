@@ -140,10 +140,10 @@ public class AgilePlaceClientController {
     }
 
     protected void updateACardType() {
-        System.out.println("updateACardType()");
         int BOARD_ADMINISTRATION = 2076380043;
         int BOARD_USINE_ADB = 1823652151;
         int BOARD_ESTIMATION = 1954823342;
+        System.out.println("updateACardType()");
         try {
             List<Integer> boardList = List.of(BOARD_ADMINISTRATION, BOARD_USINE_ADB, BOARD_ESTIMATION);
             for (int boardId : boardList) {
