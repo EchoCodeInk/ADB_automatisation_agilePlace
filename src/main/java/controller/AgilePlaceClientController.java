@@ -34,27 +34,27 @@ public class AgilePlaceClientController {
         scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierDesObjectifs,
                 0,
-                12,
-                TimeUnit.HOURS
+                calculateInitialDelayForDailyExecution(),
+                TimeUnit.MINUTES
         );
 
         scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierEnCoursDEstimation,
                 0,
-                12,
-                TimeUnit.HOURS
+                calculateInitialDelayForDailyExecution(),
+                TimeUnit.MINUTES
         );
         scheduler.scheduleAtFixedRate(
                 this::setAndUpdateWipLimiteOfEnCourDEstimationLane,
                 0,
-                12,
-                TimeUnit.HOURS
+                calculateInitialDelayForDailyExecution(),
+                TimeUnit.MINUTES
         );
         scheduler.scheduleAtFixedRate(
-                this:: updateACardType,
+                this::updateACardType,
                 0,
-                12,
-                TimeUnit.HOURS
+                calculateInitialDelayForDailyExecution(),
+                TimeUnit.MINUTES
         );
 
     }
@@ -63,7 +63,7 @@ public class AgilePlaceClientController {
         LocalDate now = LocalDate.now();
         LocalDate tomorrow = now.plusDays(1);
         LocalDateTime midnight = LocalDateTime.of(tomorrow, LocalTime.MIDNIGHT);
-        return Duration.between(LocalDateTime.now(), midnight).toMillis();
+        return Duration.between(LocalDateTime.now(), midnight).toMinutes();
     }
 
 
@@ -141,9 +141,11 @@ public class AgilePlaceClientController {
 
     protected void updateACardType() {
         System.out.println("updateACardType()");
-        int
+        int BOARD_ADMINISTRATION = 2076380043;
+        int BOARD_USINE_ADB = 1823652151;
+        int BOARD_ESTIMATION = 1954823342;
         try {
-            List<Integer> boardList = List.of(2076380043, 1823652151, 1954823342);
+            List<Integer> boardList = List.of(BOARD_ADMINISTRATION, BOARD_USINE_ADB, BOARD_ESTIMATION);
             for (int boardId : boardList) {
                 apiClient.updateACardType(boardId);
             }
