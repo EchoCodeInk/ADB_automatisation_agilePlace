@@ -8,13 +8,23 @@ import com.google.gson.Gson;
 import okhttp3.*;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import okio.BufferedSink;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+
+import org.jetbrains.annotations.NotNull;
+
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import java.io.File;
-import java.io.IOException;
+
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.valueOf;
 import static model.Semestre.Mois.moisAPartirDe;
 import static model.Semestre.obtenirMoisActuel;
+
 
 public class AgilePlaceClient {
     private OkHttpClient client;
@@ -88,6 +99,11 @@ public class AgilePlaceClient {
     private final int CAL_SYLVAIN_SEM_2 = 2078662899;
     private final int CAL_SYLVAIN_SEM_3 = 2078730789;
     private final int CAL_SYLVAIN_SEM_4 = 2078730790;
+    private final int CAL_CHARGER_DE_PROJET_MAIN_LANE = 2092144910;
+    private final int CAL_CHARGER_DE_PROJET_SEM_1 = 2092074709;
+    private final int CAL_CHARGER_DE_PROJET_SEM_2 = 2092144907;
+    private final int CAL_CHARGER_DE_PROJET_SEM_3 = 2092144908;
+    private final int CAL_CHARGER_DE_PROJET_SEM_4 = 2092144909;
 
     public AgilePlaceClient() {
         this.apiConnector = new AgilePlaceConnector();
@@ -373,8 +389,18 @@ public class AgilePlaceClient {
         sylvainSchedule.put("lane_week_3", CAL_SYLVAIN_SEM_3);
         sylvainSchedule.put("lane_week_4", CAL_SYLVAIN_SEM_4);
 
-
         groupSchedule.add(sylvainSchedule);
+
+        Map<String, Integer> chargeDeProjetSchedule = new HashMap<>();
+        chargeDeProjetSchedule.put("boardId", BOARD_ESTIMATION);
+        chargeDeProjetSchedule.put("main_lane", CAL_CHARGER_DE_PROJET_MAIN_LANE);
+        chargeDeProjetSchedule.put("lane_week_1", CAL_CHARGER_DE_PROJET_SEM_1);
+        chargeDeProjetSchedule.put("lane_week_2", CAL_CHARGER_DE_PROJET_SEM_2);
+        chargeDeProjetSchedule.put("lane_week_3", CAL_CHARGER_DE_PROJET_SEM_3);
+        chargeDeProjetSchedule.put("lane_week_4", CAL_CHARGER_DE_PROJET_SEM_4);
+
+        groupSchedule.add(chargeDeProjetSchedule);
+
         return groupSchedule;
     }
 
@@ -437,13 +463,14 @@ public class AgilePlaceClient {
     }
 
     private void updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(int boardId, int initialLane, int laneMoveTo, int laneWeek, List<String> dimancheSemaines) {
+
         try {
             CardList cards = getListOfCardsFromLane(initialLane);
             if (cards != null) {
-                List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1, CAL_SYLVAIN_SEM_1);
-                List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2, CAL_SYLVAIN_SEM_2);
-                List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3, CAL_SYLVAIN_SEM_3);
-                List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4, CAL_SYLVAIN_SEM_4);
+                List<Integer> laneSemaine1 = Arrays.asList(CAL_ANDRE_SEM_1, CAL_JESSY_SEM_1, CAL_MARIO_SEM_1, CAL_GAETAN_SEM_1, CAL_SYLVAIN_SEM_1, CAL_CHARGER_DE_PROJET_SEM_1);
+                List<Integer> laneSemaine2 = Arrays.asList(CAL_ANDRE_SEM_2, CAL_JESSY_SEM_2, CAL_MARIO_SEM_2, CAL_GAETAN_SEM_2, CAL_SYLVAIN_SEM_2, CAL_CHARGER_DE_PROJET_SEM_2);
+                List<Integer> laneSemaine3 = Arrays.asList(CAL_ANDRE_SEM_3, CAL_JESSY_SEM_3, CAL_MARIO_SEM_3, CAL_GAETAN_SEM_3, CAL_SYLVAIN_SEM_3, CAL_CHARGER_DE_PROJET_SEM_3);
+                List<Integer> laneSemaine4 = Arrays.asList(CAL_ANDRE_SEM_4, CAL_JESSY_SEM_4, CAL_MARIO_SEM_4, CAL_GAETAN_SEM_4, CAL_SYLVAIN_SEM_4, CAL_CHARGER_DE_PROJET_SEM_4);
 
                 if (laneSemaine1.contains(laneMoveTo)) {
                     Map<String, Object> propertiesToUpdate = setTitleAndDescriptionOfLane(dimancheSemaines.getFirst(), null);
@@ -633,8 +660,10 @@ public class AgilePlaceClient {
 
 
     public void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
+
+
         try {
-            List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898);
+            List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898,2092074709);
             int newWipLimit = 0;
             if (LocalDate.now().getDayOfWeek() != dayOfWipLimite)
                 dayOfWipLimite = LocalDate.now().getDayOfWeek();
@@ -696,12 +725,12 @@ public class AgilePlaceClient {
             CardTypeList cardTypeList_usine_ADB = getListOfCardTypes(USINE_ADB_BOARD);
             CardTypeList cardTypeList_boardId = getListOfCardTypes(boardId);
             List<String> cardTypeList_boardIdToCompare = new ArrayList<>();
-            for (CardType cardType :cardTypeList_boardId.getCardTypes()){
+            for (CardType cardType : cardTypeList_boardId.getCardTypes()) {
                 cardTypeList_boardIdToCompare.add(cardType.getName());
             }
 
             for (CardType cardType : cardTypeList_usine_ADB.getCardTypes()) {
-                if (!cardTypeList_boardIdToCompare.contains(cardType.getName())){
+                if (!cardTypeList_boardIdToCompare.contains(cardType.getName())) {
                     Map<String, Object> cardTypeToSet = new HashMap<>();
                     Gson gson = new Gson();
                     cardTypeToSet.put("name", cardType.getName());
@@ -722,6 +751,53 @@ public class AgilePlaceClient {
         }
     }
 
+    public void openEtatDeCompte() {
+        File file = new File("C:\\Users\\echolette\\OneDrive - ADB 2022 inc\\Documents\\01-Etat_de_compte\\EtatdeCompte.PDF"); // Chemin vers votre fichier PDF
+
+        try ( PDDocument document = PDDocument.load(file)) {
+            int pageCount = document.getNumberOfPages();
+
+            for (int i = 0; i < pageCount; i++) {
+                PDPage page = document.getPage(i);
+
+                PDFTextStripper pdfStripper = new PDFTextStripper();
+                pdfStripper.setStartPage(i + 1);
+                pdfStripper.setEndPage(i + 1);
+                String text = pdfStripper.getText(document);
+
+                // Extraire le courriel du texte de la page
+                String email = extractEmail(text);
+
+                // Envoyer l'état de compte par courriel au client correspondant
+                sendEmail(email, text); // Implémentez cette méthode pour envoyer l'e-mail
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    // Méthode pour extraire l'adresse e-mail du texte
+    private String extractEmail(String text) {
+        String[] lines = text.split("\\r?\\n"); // Diviser le texte en lignes
+        String email = "";
+
+        // Parcourir les lignes pour trouver celle contenant "Courriel:"
+        for (String line : lines) {
+            if (line.contains("Courriel:")) {
+                // Extraire l'adresse e-mail de la ligne
+                email = line.replaceAll("Courriel:", "").trim();
+                break; // Sortir de la boucle une fois que l'e-mail est trouvé
+            }
+        }
+        return email;
+    }
+
+    // Méthode pour envoyer un e-mail
+    private void sendEmail(String email, String content) {
+        // Implémentez la logique pour envoyer l'e-mail au client correspondant
+        // Utilisez une bibliothèque de courrier électronique Java comme JavaMail pour envoyer l'e-mail
+        System.out.println("Email sent to: " + email); // Affichage temporaire
+        //System.out.println("Content: " + content); // Affichage temporaire
+    }
     private CardEvent getActivityFromCard(String cardId) {
         String activityString = makeAPICall("/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
         Gson gson = new Gson();

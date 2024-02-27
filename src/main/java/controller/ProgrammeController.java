@@ -3,6 +3,7 @@ package controller;
 
 import api.AgilePlaceClient;
 
+
 public class ProgrammeController {
     private AgilePlaceClientController agilePlaceController;
     private AgilePlaceClient agilePlaceClient;
@@ -13,9 +14,9 @@ public class ProgrammeController {
         this.agilePlaceClient = new AgilePlaceClient();
     }
 
-    public void startProgramme() {
+    public void startProgramme()  {
         System.out.println("START PROGRAMME ");
-        //agilePlaceClient.getListOfCardTypes(1823652151);
+        agilePlaceClient.openEtatDeCompte();
         agilePlaceController.updateACardType();
         agilePlaceController.setAndUpdateWipLimiteOfEnCourDEstimationLane();
         agilePlaceController.updateAttachmentForMagasinCheckList();
