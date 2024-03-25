@@ -1,7 +1,6 @@
 package api;
 
 
-import com.twilio.twiml.voice.Prompt;
 import model.*;
 import com.google.gson.Gson;
 
@@ -17,13 +16,9 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import java.io.File;
-
 
 
 import java.text.ParseException;
@@ -221,6 +216,7 @@ public class AgilePlaceClient {
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
+        System.out.println("reponseAPI" + reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
     }
 
@@ -609,7 +605,6 @@ public class AgilePlaceClient {
         try {
             int USINE_ADB_GERANCE_DE_PROJET_A_ATTRIBUER_LANE = 1897212305;
             int USINE_ADB_ARCHIVES_LANE = 1823767913;
-
             int ADMINISTRATION_CARTES_LANE = 2076409564;
             int ADMINISTRATION_ARCHIVE_LANE = 2076409565;
 
@@ -627,8 +622,51 @@ public class AgilePlaceClient {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans findDuplicateCardInLanes() " + e.getMessage());
         }
+    }
 
+    private ArrayList<CustomField> searchSameCustomField(List<CustomField> valeurDeRecherche, List<CustomField> baseDeRecherche) {
+        ArrayList<CustomField> champsTrouves = new ArrayList<>();
+        if (!valeurDeRecherche.isEmpty() && !baseDeRecherche.isEmpty()) {
+            for (CustomField customFieldRecherche : valeurDeRecherche) {
+                for (CustomField customFieldBaseDeRecherche : baseDeRecherche) {
+                    if (customFieldRecherche.getLabel().equals(customFieldBaseDeRecherche.getLabel())) {
+                        customFieldBaseDeRecherche.setIndex(customFieldRecherche.getIndex());
+                        champsTrouves.add(customFieldBaseDeRecherche);
+                    }
+                }
+            }
+        }
+        return champsTrouves;
+    }
 
+    public void copieChampPersonnalise() {
+        int BOARD_USINE_LANE_GERANCE_DE_PROJET_A_ATTRIBUER = 1897212305;
+        int CALENDRIER_DES_OBJECTIF = 2072271545;
+        int BOARD_USINE = 1823652151;
+        try {
+            CardList cardListUsine = getListOfCardsFromLane(BOARD_USINE_LANE_GERANCE_DE_PROJET_A_ATTRIBUER);
+            CardList cardListCalendrier = getListOfCardsFromLane(CALENDRIER_DES_OBJECTIF);
+            Card custumFieldUsine = getCustumFieldList(BOARD_USINE);
+            if (!cardListUsine.getCards().isEmpty()) {
+                for (int i = 0; i < cardListUsine.getCards().size(); i++) {
+                    for (Card cardEstimation : cardListCalendrier.getCards()) {
+                        Card cardUsine = cardListUsine.getCards().get(i);
+                        if (cardUsine.getTitle().equals(cardEstimation.getTitle())) {
+                            Card cardUsineInfo = getInfoCard(cardUsine.getId());
+                            Card cardEstimationInfo = getInfoCard(cardEstimation.getId());
+                            ArrayList<CustomField> customFieldToUpdate = searchSameCustomField(custumFieldUsine.getCustomFields(), cardEstimationInfo.getCustomFields());
+                            for (CustomField customField : customFieldToUpdate) {
+                                updateCustomField(Integer.parseInt(cardUsineInfo.getId()), customField.getValue(), BOARD_USINE, customField.getIndex());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (
+                Exception e) {
+            handleException(e);
+            System.out.println("Une exception spécifique s'est produite dans copieChampPersonnalise() " + e.getMessage());
+        }
     }
 
     public void updateAttachmentForMagasinCheckList() {
@@ -663,7 +701,7 @@ public class AgilePlaceClient {
 
 
         try {
-            List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898,2092074709);
+            List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898, 2092074709);
             int newWipLimit = 0;
             if (LocalDate.now().getDayOfWeek() != dayOfWipLimite)
                 dayOfWipLimite = LocalDate.now().getDayOfWeek();
@@ -754,7 +792,7 @@ public class AgilePlaceClient {
     public void openEtatDeCompte() {
         File file = new File("C:\\Users\\echolette\\OneDrive - ADB 2022 inc\\Documents\\01-Etat_de_compte\\EtatdeCompte.PDF"); // Chemin vers votre fichier PDF
 
-        try ( PDDocument document = PDDocument.load(file)) {
+        try (PDDocument document = PDDocument.load(file)) {
             int pageCount = document.getNumberOfPages();
 
             for (int i = 0; i < pageCount; i++) {
@@ -775,6 +813,7 @@ public class AgilePlaceClient {
             e.printStackTrace();
         }
     }
+
     // Méthode pour extraire l'adresse e-mail du texte
     private String extractEmail(String text) {
         String[] lines = text.split("\\r?\\n"); // Diviser le texte en lignes
@@ -798,10 +837,74 @@ public class AgilePlaceClient {
         System.out.println("Email sent to: " + email); // Affichage temporaire
         //System.out.println("Content: " + content); // Affichage temporaire
     }
+
     private CardEvent getActivityFromCard(String cardId) {
         String activityString = makeAPICall("/card/" + cardId + "/activity?limit=5&direction=newer", "GET", null);
         Gson gson = new Gson();
         return gson.fromJson(activityString, CardEvent.class);
+    }
+
+    private Card getCustumFieldList(int boardId) {
+        String customFieldList = makeAPICall("/board/" + boardId + "/customfield", "GET", null);
+        Gson gson = new Gson();
+        return gson.fromJson(customFieldList, Card.class);
+    }
+
+    private void updateCustomField(int cardId, String valueChoice, int boardId, int indexCustomFields) {
+        // Obtenez la carte à mettre à jour (j'ai supposé que cela fonctionnait correctement)
+        Card card = getCustumFieldList(boardId);
+
+        // Vérifiez que la carte et ses champs personnalisés existent
+        if (card != null && card.getCustomFields() != null && !card.getCustomFields().isEmpty()) {
+            // Obtenez le dernier champ personnalisé de la carte
+            CustomField lastCustomField = card.getCustomFields().get(indexCustomFields);
+
+            // Construisez un objet pour représenter le champ personnalisé à mettre à jour
+            CustomFieldValue customFieldValue = new CustomFieldValue();
+            // customFieldValue.setFieldId(lastCustomField.getFieldId());
+            //customFieldValue.setValue(valueChoice);
+
+            customFieldValue.setFieldId(lastCustomField.getId());
+            customFieldValue.setValue(valueChoice);
+
+            // Construisez l'opération JSON complète
+            CustomFieldOperation customFieldOperation = new CustomFieldOperation();
+            customFieldOperation.setOp("replace");
+            customFieldOperation.setPath("/customFields/" + indexCustomFields);
+            customFieldOperation.setValue(customFieldValue);
+
+            // Utilisez Gson pour convertir l'objet en JSON
+            Gson gson = new Gson();
+            String json = gson.toJson(customFieldOperation);
+
+            json = "[" + json + "]";
+            // Définissez le type de contenu de la demande
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+            // Créez un objet RequestBody avec le JSON
+            RequestBody requestBody = RequestBody.create(json, JSON);
+
+            // Faites l'appel API pour mettre à jour le champ personnalisé
+            makeAPICall("/card/" + cardId, "PATCH", requestBody);
+        } else {
+            System.out.println("La carte ou les champs personnalisés sont introuvables.");
+        }
+    }
+
+    public void masseUpdateOfCostumFieldProbabiliteDeGagner() {
+        int lanePerdue = 2058436639;
+        int indexOfCostumField = 10;
+        CardList cardLists = getListOfCardsFromLane(lanePerdue);
+        Card customFieldList = getCustumFieldList(BOARD_ESTIMATION);
+        for (Card card : cardLists.getCards()) {
+            card.setCustomFields(customFieldList.getCustomFields());
+            String choixGagne = card.getCustomFields().get(indexOfCostumField).getChoiceConfiguration().getChoices().getFirst();
+            String choixPerdu = card.getCustomFields().get(indexOfCostumField).getChoiceConfiguration().getChoices().getLast();
+            updateCustomField(Integer.parseInt(card.getId()), choixGagne, BOARD_ESTIMATION, indexOfCostumField);
+            System.out.println();
+
+        }
+
     }
 
     //Obtenez une liste de tous les cartes pour un tableau spécifique

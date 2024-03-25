@@ -16,7 +16,8 @@ public class ProgrammeController {
 
     public void startProgramme()  {
         System.out.println("START PROGRAMME ");
-        agilePlaceClient.openEtatDeCompte();
+        //agilePlaceClient.openEtatDeCompte();
+        agilePlaceController.copieChampPersonnalise();
         agilePlaceController.updateACardType();
         agilePlaceController.setAndUpdateWipLimiteOfEnCourDEstimationLane();
         agilePlaceController.updateAttachmentForMagasinCheckList();

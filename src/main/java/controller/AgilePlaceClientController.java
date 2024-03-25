@@ -32,6 +32,14 @@ public class AgilePlaceClientController {
         );
 
         scheduler.scheduleAtFixedRate(
+                this::copieChampPersonnalise,
+                0,
+                1,
+                TimeUnit.MINUTES
+        );
+
+
+        scheduler.scheduleAtFixedRate(
                 this::setBoardEstimationLaneCalendrierDesObjectifs,
                 0,
                 calculateInitialDelayForDailyExecution(),
@@ -75,7 +83,7 @@ public class AgilePlaceClientController {
             System.out.println("gestionCardSylvain() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in gestionCardSylvain(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController gestionCardSylvain(): " + e.getMessage());
         }
     }
 
@@ -89,7 +97,7 @@ public class AgilePlaceClientController {
             System.out.println("setBoardEstimationLaneCalendrierDesObjectifs() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in setBoardEstimationLaneCalendrierDesObjectifs(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController setBoardEstimationLaneCalendrierDesObjectifs(): " + e.getMessage());
         }
     }
 
@@ -102,7 +110,7 @@ public class AgilePlaceClientController {
             System.out.println("setBoardEstimationLaneCalendrierEnCoursDEstimation() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in setBoardEstimationLaneCalendrierEnCoursDEstimation(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController setBoardEstimationLaneCalendrierEnCoursDEstimation(): " + e.getMessage());
         }
     }
 
@@ -113,7 +121,7 @@ public class AgilePlaceClientController {
             System.out.println("updateAttachmentForMagasinCheckList() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in updateAttachmentForMagasinCheckList(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController updateAttachmentForMagasinCheckList(): " + e.getMessage());
         }
     }
 
@@ -124,7 +132,7 @@ public class AgilePlaceClientController {
             System.out.println("gestionDuplicateCardInLanes() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in gestionDuplicateCardInLanes(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController gestionDuplicateCardInLanes(): " + e.getMessage());
         }
     }
 
@@ -135,7 +143,7 @@ public class AgilePlaceClientController {
             System.out.println("setAndUpdateWipLimiteOfEnCourDEstimationLane() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in setAndUpdateWipLimiteOfEnCourDEstimationLane(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController setAndUpdateWipLimiteOfEnCourDEstimationLane(): " + e.getMessage());
         }
     }
 
@@ -152,7 +160,19 @@ public class AgilePlaceClientController {
             System.out.println("updateACardType() - End");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error in updateACardType(): " + e.getMessage());
+            System.err.println("Error in AgilePlaceClientController updateACardType(): " + e.getMessage());
         }
     }
+
+    protected void copieChampPersonnalise() {
+        System.out.println("copieChampPersonnalise()");
+        try {
+                apiClient.copieChampPersonnalise();
+            System.out.println("copieChampPersonnalise() - End");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error in AgilePlaceClientController copieChampPersonnalise(): " + e.getMessage());
+        }
+    }
+
 }

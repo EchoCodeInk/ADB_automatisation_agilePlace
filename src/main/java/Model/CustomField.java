@@ -2,11 +2,14 @@ package model;
 
 public class CustomField {
 
+    private String fieldId;
     private String id;
     private int index;
     private String type;
     private String label;
+    private String value;
     private String helpText;
+    private ChoiceConfiguration choiceConfiguration;
     private String createdOn;
     private String createdBy;
 
@@ -19,6 +22,22 @@ public class CustomField {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getFieldId() {
+        return fieldId;
+    }
+
+    public void setFieldId(String fieldId) {
+        this.fieldId = fieldId;
     }
 
     public int getIndex() {
@@ -55,6 +74,14 @@ public class CustomField {
 
     public String getCreatedOn() {
         return createdOn;
+    }
+
+    public ChoiceConfiguration getChoiceConfiguration() {
+        return choiceConfiguration;
+    }
+
+    public void setChoiceConfiguration(ChoiceConfiguration choiceConfiguration) {
+        this.choiceConfiguration = choiceConfiguration;
     }
 
     public void setCreatedOn(String createdOn) {
