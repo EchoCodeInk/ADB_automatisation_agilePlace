@@ -17,12 +17,12 @@ public class AgilePlaceClientController {
         this.apiClient = new AgilePlaceClient();
         this.scheduler = Executors.newScheduledThreadPool(1);
 
-        scheduler.scheduleAtFixedRate(
-                this::gestionCardSylvain,
-                1,
-                2,
-                TimeUnit.MINUTES
-        );
+//        scheduler.scheduleAtFixedRate(
+//                this::gestionCardSylvain,
+//                1,
+//                2,
+//                TimeUnit.MINUTES
+//        );
 
         scheduler.scheduleAtFixedRate(
                 this::gestionDuplicateCardInLanes,
@@ -75,17 +75,17 @@ public class AgilePlaceClientController {
     }
 
 
-    protected void gestionCardSylvain() {
-        System.out.println("gestionCardSylvain()");
-        try {
-            apiClient.moveCardOfBoardEstimationOfTheLaneSylvain();
-            apiClient.reflectionOfBoardEstimationLainSuiviEstimationSylvain();
-            System.out.println("gestionCardSylvain() - End");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Error in AgilePlaceClientController gestionCardSylvain(): " + e.getMessage());
-        }
-    }
+//    protected void gestionCardSylvain() {
+//        System.out.println("gestionCardSylvain()");
+//        try {
+//            //apiClient.moveCardOfBoardEstimationOfTheLaneSylvain();
+//            //apiClient.reflectionOfBoardEstimationLainSuiviEstimationSylvain();
+//            System.out.println("gestionCardSylvain() - End");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.err.println("Error in AgilePlaceClientController gestionCardSylvain(): " + e.getMessage());
+//        }
+//    }
 
     protected void setBoardEstimationLaneCalendrierDesObjectifs() {
         System.out.println("setBoardEstimationLaneCalendrierDesObjectifs()");

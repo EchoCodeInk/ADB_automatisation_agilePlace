@@ -216,7 +216,7 @@ public class AgilePlaceClient {
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
-        System.out.println("reponseAPI" + reponseAPI);
+        //System.out.println("reponseAPI" + reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
     }
 
@@ -239,56 +239,56 @@ public class AgilePlaceClient {
         return gson.fromJson(cardsString, CardList.class);
     }
 
-    //Deplacement des cartes enfant
-    public void moveCardOfBoardEstimationOfTheLaneSylvain() {
-        try {
-            CardList cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
-            CardList cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
-            CardList verificationForDuplicatecards = getListOfCardsFromLane(2055700927);
-            List<Card> cardList = new ArrayList<>();
-            List<Card> cardList2 = new ArrayList<>();
-            if (cards != null) {
-                cardList = cards.getCards();
-            }
-
-            if (cards2 != null) {
-                cardList2 = cards2.getCards();
-            }
-
-
-            if (!cardList.isEmpty()) {
-                for (Card cardFromList : cardList) {
-                    Card cardToMove = getInfoCard(cardFromList.getId());
-                    if (!cardList2.isEmpty()) {
-                        for (Card cardFromList2 : cardList2) {
-                            Card cardCompare = getInfoCard(cardFromList2.getId());
-                            if (cardCompare != null && cardCompare.getCustomId().getValue().equals(cardToMove.getCustomId().getValue())) {
-                                for (AssignedUser assignedUser : cardToMove.getAssignedUsers()) {
-                                    String fullName = assignedUser.getFullName();
-                                    switch (fullName) {
-                                        case "Jessy Therrien" ->
-                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_JESSY);
-                                        case "André Berthiaume" ->
-                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_ANDRE);
-                                        case "Mario Vivier" ->
-                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_MARIO);
-                                        case "Gaétan Dussault" ->
-                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_GAETAN);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (verificationForDuplicatecards != null) {
-                findDuplicateCard(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
-            }
-        } catch (Exception e) {
-            handleException(e);
-            System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() " + e.getMessage());
-        }
-    }
+    //Deplacement des cartes Sylvain
+//    public void moveCardOfBoardEstimationOfTheLaneSylvain() {
+//        try {
+//            CardList cards = getListOfCardsFromLane(BOARD_ESTIMATION_VERIfICATION_SYLVAIN);
+//            CardList cards2 = getListOfCardsFromLane(BOARD_CRM_VERIfICATION_TERMINE);
+//            CardList verificationForDuplicatecards = getListOfCardsFromLane(2055700927);
+//            List<Card> cardList = new ArrayList<>();
+//            List<Card> cardList2 = new ArrayList<>();
+//            if (cards != null) {
+//                cardList = cards.getCards();
+//            }
+//
+//            if (cards2 != null) {
+//                cardList2 = cards2.getCards();
+//            }
+//
+//
+//            if (!cardList.isEmpty()) {
+//                for (Card cardFromList : cardList) {
+//                    Card cardToMove = getInfoCard(cardFromList.getId());
+//                    if (!cardList2.isEmpty()) {
+//                        for (Card cardFromList2 : cardList2) {
+//                            Card cardCompare = getInfoCard(cardFromList2.getId());
+//                            if (cardCompare != null && cardCompare.getCustomId().getValue().equals(cardToMove.getCustomId().getValue())) {
+//                                for (AssignedUser assignedUser : cardToMove.getAssignedUsers()) {
+//                                    String fullName = assignedUser.getFullName();
+//                                    switch (fullName) {
+//                                        case "Jessy Therrien" ->
+//                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_JESSY);
+//                                        case "André Berthiaume" ->
+//                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_ANDRE);
+//                                        case "Mario Vivier" ->
+//                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_MARIO);
+//                                        case "Gaétan Dussault" ->
+//                                                moveCard(cardToMove.getId(), BOARD_ESTIMATION_LANE_COURRIEL_ET_RELANCE_GAETAN);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            if (verificationForDuplicatecards != null) {
+//                findDuplicateCard(verificationForDuplicatecards.getCards(), BOARD_ESTIMATION_LANE_ARCHIVE);
+//            }
+//        } catch (Exception e) {
+//            handleException(e);
+//            System.out.println("Une exception spécifique s'est produite dans moveCardOfBoardEstimationOfTheLaneSylvain() " + e.getMessage());
+//        }
+//    }
 
     private Lane getInfoOfLane(int boardId, int laneId) {
         Gson gson = new Gson();
@@ -459,7 +459,6 @@ public class AgilePlaceClient {
     }
 
     private void updateTitleAndDescriptionOfCalendrierEnCoursDEstimation(int boardId, int initialLane, int laneMoveTo, int laneWeek, List<String> dimancheSemaines) {
-
         try {
             CardList cards = getListOfCardsFromLane(initialLane);
             if (cards != null) {
@@ -656,7 +655,9 @@ public class AgilePlaceClient {
                             Card cardEstimationInfo = getInfoCard(cardEstimation.getId());
                             ArrayList<CustomField> customFieldToUpdate = searchSameCustomField(custumFieldUsine.getCustomFields(), cardEstimationInfo.getCustomFields());
                             for (CustomField customField : customFieldToUpdate) {
-                                updateCustomField(Integer.parseInt(cardUsineInfo.getId()), customField.getValue(), BOARD_USINE, customField.getIndex());
+                                if (cardUsineInfo.getCustomFields().get(i).getValue().isEmpty()) {
+                                    updateCustomField(Integer.parseInt(cardUsineInfo.getId()), customField.getValue(), BOARD_USINE, customField.getIndex());
+                                }
                             }
                         }
                     }
@@ -673,28 +674,29 @@ public class AgilePlaceClient {
         //envoyerSMS("5147788120","test salut");
     }
 
-    public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
-        try {
-            CardList suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);
-            CardList crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
-            List<String> costumIdJobs = new ArrayList<>();
-            if (suiviEstimationSylvainCards != null) {
-                for (Card card : suiviEstimationSylvainCards.getCards()) {
-                    costumIdJobs.add(card.getCustomId().getValue());
-                }
-            }
-            if (crmSuiviSylvainCards != null) {
-                for (Card card : crmSuiviSylvainCards.getCards()) {
-                    if (!costumIdJobs.contains(card.getCustomId().getValue())) {
-                        moveCard(card.getId(), "1907499860");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            handleException(e);
-            System.out.println("Une exception spécifique s'est produite dans reflectionOfBoardEstimationLainSuiviEstimationSylvain() " + e.getMessage());
-        }
-    }
+//    public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
+//        int BOARD_CRM_SYLVAIN_LANE_ARCHIVE = 1907499860;
+//        try {
+//            CardList suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);
+//            CardList crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
+//            List<String> costumIdJobs = new ArrayList<>();
+//            if (suiviEstimationSylvainCards != null) {
+//                for (Card card : suiviEstimationSylvainCards.getCards()) {
+//                    costumIdJobs.add(card.getCustomId().getValue());
+//                }
+//            }
+//            if (crmSuiviSylvainCards != null) {
+//                for (Card card : crmSuiviSylvainCards.getCards()) {
+//                    if (!costumIdJobs.contains(card.getCustomId().getValue())) {
+//                        moveCard(card.getId(), String.valueOf(BOARD_CRM_SYLVAIN_LANE_ARCHIVE));
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            handleException(e);
+//            System.out.println("Une exception spécifique s'est produite dans reflectionOfBoardEstimationLainSuiviEstimationSylvain() " + e.getMessage());
+//        }
+//    }
 
 
     public void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
@@ -778,8 +780,7 @@ public class AgilePlaceClient {
                     String json = gson.toJson(cardTypeToSet);
                     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                     RequestBody requestBody = RequestBody.create(json, JSON);
-                    String reponseAPI = makeAPICall("/board/" + boardId + "/cardType", "POST", requestBody);
-                    System.out.println("reponseAPI :" + reponseAPI);
+                    makeAPICall("/board/" + boardId + "/cardType", "POST", requestBody);
                 }
             }
 
@@ -861,8 +862,6 @@ public class AgilePlaceClient {
 
             // Construisez un objet pour représenter le champ personnalisé à mettre à jour
             CustomFieldValue customFieldValue = new CustomFieldValue();
-            // customFieldValue.setFieldId(lastCustomField.getFieldId());
-            //customFieldValue.setValue(valueChoice);
 
             customFieldValue.setFieldId(lastCustomField.getId());
             customFieldValue.setValue(valueChoice);

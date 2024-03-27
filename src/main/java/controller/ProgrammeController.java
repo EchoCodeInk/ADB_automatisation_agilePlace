@@ -22,7 +22,7 @@ public class ProgrammeController {
         agilePlaceController.setAndUpdateWipLimiteOfEnCourDEstimationLane();
         agilePlaceController.updateAttachmentForMagasinCheckList();
         agilePlaceController.gestionDuplicateCardInLanes();
-        agilePlaceController.gestionCardSylvain();
+        //agilePlaceController.gestionCardSylvain();
         agilePlaceController.setBoardEstimationLaneCalendrierDesObjectifs();
         agilePlaceController.setBoardEstimationLaneCalendrierEnCoursDEstimation();
     }
