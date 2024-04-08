@@ -1,6 +1,8 @@
 package api;
 
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import model.*;
 import com.google.gson.Gson;
 
@@ -216,7 +218,7 @@ public class AgilePlaceClient {
     private Card getInfoCard(String id) {
         String reponseAPI = makeAPICall("/card/" + id, "GET", null);
         Gson gson = new Gson();
-        //System.out.println("reponseAPI" + reponseAPI);
+        System.out.println("reponseAPI" + reponseAPI);
         return gson.fromJson(reponseAPI, Card.class);
     }
 
@@ -624,18 +626,26 @@ public class AgilePlaceClient {
     }
 
     private ArrayList<CustomField> searchSameCustomField(List<CustomField> valeurDeRecherche, List<CustomField> baseDeRecherche) {
-        ArrayList<CustomField> champsTrouves = new ArrayList<>();
+        ArrayList<CustomField> customFieldsCommun = new ArrayList<>();
+
+
         if (!valeurDeRecherche.isEmpty() && !baseDeRecherche.isEmpty()) {
-            for (CustomField customFieldRecherche : valeurDeRecherche) {
-                for (CustomField customFieldBaseDeRecherche : baseDeRecherche) {
+            for (int i = 0; i < valeurDeRecherche.size(); i++) {
+                CustomField customFieldRecherche = valeurDeRecherche.get(i);
+                for (int j = 0; j < baseDeRecherche.size(); j++) {
+                    CustomField customFieldBaseDeRecherche = baseDeRecherche.get(j);
                     if (customFieldRecherche.getLabel().equals(customFieldBaseDeRecherche.getLabel())) {
-                        customFieldBaseDeRecherche.setIndex(customFieldRecherche.getIndex());
-                        champsTrouves.add(customFieldBaseDeRecherche);
+                        CustomField customField = new CustomField();
+                        customField.setIndex(customFieldRecherche.getIndex());
+                        customField.setValue(customFieldBaseDeRecherche.getValue());
+                        customField.setLabel(customFieldRecherche.getLabel());
+                        customFieldsCommun.add(customField);
+
                     }
                 }
             }
         }
-        return champsTrouves;
+        return customFieldsCommun;
     }
 
     public void copieChampPersonnalise() {
@@ -643,20 +653,19 @@ public class AgilePlaceClient {
         int CALENDRIER_DES_OBJECTIF = 2072271545;
         int BOARD_USINE = 1823652151;
         try {
-            CardList cardListUsine = getListOfCardsFromLane(BOARD_USINE_LANE_GERANCE_DE_PROJET_A_ATTRIBUER);
-            CardList cardListCalendrier = getListOfCardsFromLane(CALENDRIER_DES_OBJECTIF);
-            Card custumFieldUsine = getCustumFieldList(BOARD_USINE);
-            if (!cardListUsine.getCards().isEmpty()) {
-                for (int i = 0; i < cardListUsine.getCards().size(); i++) {
-                    for (Card cardEstimation : cardListCalendrier.getCards()) {
-                        Card cardUsine = cardListUsine.getCards().get(i);
+            CardList listOfCardFromeUsine = getListOfCards(BOARD_USINE_LANE_GERANCE_DE_PROJET_A_ATTRIBUER);
+            CardList listOfCardFromEstimation = getListOfCards(CALENDRIER_DES_OBJECTIF);
+            CustomFields customFieldUsine = getCustomFieldList(BOARD_USINE);
+
+            if (!customFieldUsine.getCustomFields().isEmpty() && !listOfCardFromEstimation.getCards().isEmpty() && !listOfCardFromeUsine.getCards().isEmpty()) {
+                for (int i = 0; i < listOfCardFromeUsine.getCards().size(); i++) {
+                    for (Card cardEstimation : listOfCardFromEstimation.getCards()) {
+                        Card cardUsine = listOfCardFromeUsine.getCards().get(i);
                         if (cardUsine.getTitle().equals(cardEstimation.getTitle())) {
-                            Card cardUsineInfo = getInfoCard(cardUsine.getId());
-                            Card cardEstimationInfo = getInfoCard(cardEstimation.getId());
-                            ArrayList<CustomField> customFieldToUpdate = searchSameCustomField(custumFieldUsine.getCustomFields(), cardEstimationInfo.getCustomFields());
-                            for (CustomField customField : customFieldToUpdate) {
-                                if (cardUsineInfo.getCustomFields().get(i).getValue().isEmpty()) {
-                                    updateCustomField(Integer.parseInt(cardUsineInfo.getId()), customField.getValue(), BOARD_USINE, customField.getIndex());
+                            ArrayList<CustomField> customFieldsCommun = searchSameCustomField(customFieldUsine.getCustomFields(), cardEstimation.getCustomFields());
+                            for (CustomField customField : customFieldsCommun) {
+                                if (cardUsine.getCustomFields().get(i).getValue().isEmpty()) {
+                                    updateCustomField(Integer.parseInt(cardUsine.getId()), customField.getValue(), BOARD_USINE, customField.getIndex());
                                 }
                             }
                         }
@@ -677,8 +686,7 @@ public class AgilePlaceClient {
 //    public void reflectionOfBoardEstimationLainSuiviEstimationSylvain() {
 //        int BOARD_CRM_SYLVAIN_LANE_ARCHIVE = 1907499860;
 //        try {
-//            CardList suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);
-//            CardList crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
+//            CardList suiviEstimationSylvainCards = getListOfCardsFromLane(BOARD_ESTIMATION_LANE_SUIVI_ESTIMATION_SYLVAIN);//           CardList crmSuiviSylvainCards = getListOfCardsFromLane(BOARD_CRM_LANE_SUIVI_ESTIMATION);
 //            List<String> costumIdJobs = new ArrayList<>();
 //            if (suiviEstimationSylvainCards != null) {
 //                for (Card card : suiviEstimationSylvainCards.getCards()) {
@@ -700,8 +708,6 @@ public class AgilePlaceClient {
 
 
     public void setAndUpdateWipLimiteOfEnCourDEstimationLane() {
-
-
         try {
             List<Integer> laneSemaineEnCours = Arrays.asList(2063557856, 2063557858, 2063557860, 2074240315, 2078662898, 2092074709);
             int newWipLimit = 0;
@@ -741,7 +747,6 @@ public class AgilePlaceClient {
         } catch (Exception e) {
             handleException(e);
             System.out.println("Une exception spécifique s'est produite dans getBoardDetails() " + e.getMessage());
-
         }
         return boardDetails;
     }
@@ -845,20 +850,20 @@ public class AgilePlaceClient {
         return gson.fromJson(activityString, CardEvent.class);
     }
 
-    private Card getCustumFieldList(int boardId) {
+    private CustomFields getCustomFieldList(int boardId) {
         String customFieldList = makeAPICall("/board/" + boardId + "/customfield", "GET", null);
         Gson gson = new Gson();
-        return gson.fromJson(customFieldList, Card.class);
+        return gson.fromJson(customFieldList, CustomFields.class);
     }
 
     private void updateCustomField(int cardId, String valueChoice, int boardId, int indexCustomFields) {
         // Obtenez la carte à mettre à jour (j'ai supposé que cela fonctionnait correctement)
-        Card card = getCustumFieldList(boardId);
+        CustomFields customFieldList = getCustomFieldList(boardId);
 
         // Vérifiez que la carte et ses champs personnalisés existent
-        if (card != null && card.getCustomFields() != null && !card.getCustomFields().isEmpty()) {
+        if (customFieldList != null && customFieldList.getCustomFields() != null && !customFieldList.getCustomFields().isEmpty()) {
             // Obtenez le dernier champ personnalisé de la carte
-            CustomField lastCustomField = card.getCustomFields().get(indexCustomFields);
+            CustomField lastCustomField = customFieldList.getCustomFields().get(indexCustomFields);
 
             // Construisez un objet pour représenter le champ personnalisé à mettre à jour
             CustomFieldValue customFieldValue = new CustomFieldValue();
@@ -894,7 +899,7 @@ public class AgilePlaceClient {
         int lanePerdue = 2058436639;
         int indexOfCostumField = 10;
         CardList cardLists = getListOfCardsFromLane(lanePerdue);
-        Card customFieldList = getCustumFieldList(BOARD_ESTIMATION);
+        CustomFields customFieldList = getCustomFieldList(BOARD_ESTIMATION);
         for (Card card : cardLists.getCards()) {
             card.setCustomFields(customFieldList.getCustomFields());
             String choixGagne = card.getCustomFields().get(indexOfCostumField).getChoiceConfiguration().getChoices().getFirst();
@@ -907,8 +912,40 @@ public class AgilePlaceClient {
     }
 
     //Obtenez une liste de tous les cartes pour un tableau spécifique
-    private String getListOfCardsOfABoard(int boardId) {
-        return makeAPICall("/card?board=" + boardId, "GET", null);
+    private CardList getListOfCardsOfABoard(int boardId) {
+        Gson gson = new Gson();
+        String reponseAPI = makeAPICall("/card?board=" + boardId, "GET", null);
+        return gson.fromJson(reponseAPI, CardList.class);
+
+    }
+
+    private CardList getListOfCards(int laneId) {
+        Gson gson = new Gson();
+
+        // Créez un objet JSON pour spécifier les paramètres de la requête
+        JsonObject requestBodyJson = new JsonObject();
+
+        // Créez un tableau JSON pour le paramètre "include"
+        JsonArray includeArrayForCustomFields = new JsonArray();
+        JsonArray includeArrayForLanes = new JsonArray();
+        includeArrayForCustomFields.add("customFields"); // Ajoutez "customFields" au tableau
+        includeArrayForLanes.add(String.valueOf(laneId));
+
+        // Ajoutez le tableau "include" à l'objet JSON de la requête
+        requestBodyJson.add("include", includeArrayForCustomFields);
+        requestBodyJson.add("lanes", includeArrayForLanes);
+
+        // Convertissez l'objet JSON en chaîne JSON
+        String json = gson.toJson(requestBodyJson);
+
+        // Définissez le type de contenu de la demande
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        // Créez un objet RequestBody avec le JSON
+        RequestBody requestBody = RequestBody.create(json, JSON);
+        String reponseAPI = makeAPICall("/card/list", "POST", requestBody);
+        //System.out.println("reponseAPI" + reponseAPI);
+        return gson.fromJson(reponseAPI, CardList.class);
     }
 
     // Mise a jour d'une carte specifique
@@ -982,7 +1019,6 @@ public class AgilePlaceClient {
 
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody requestBody = RequestBody.create(json, JSON);
-
 
         //System.out.println("updateCard() >> json" + json);
         makeAPICall("/card/" + card.getId(), "PATCH", requestBody);
